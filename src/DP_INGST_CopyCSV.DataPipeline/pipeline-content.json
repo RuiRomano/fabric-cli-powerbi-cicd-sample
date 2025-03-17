@@ -1,297 +1,297 @@
 {
-  "properties": {
-    "activities": [
-      {
-        "type": "Copy",
-        "typeProperties": {
-          "source": {
-            "type": "BinarySource",
-            "formatSettings": {
-              "type": "BinaryReadSettings"
-            },
-            "storeSettings": {
-              "type": "HttpReadSettings",
-              "requestMethod": "GET"
-            },
-            "datasetSettings": {
-              "type": "Binary",
-              "typeProperties": {
-                "location": {
-                  "type": "HttpServerLocation",
-                  "relativeUrl": "RAW-Product.csv"
+    "properties": {
+        "activities": [
+            {
+                "name": "RAW-Product",
+                "type": "Copy",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "source": {
+                        "type": "BinarySource",
+                        "storeSettings": {
+                            "type": "HttpReadSettings",
+                            "requestMethod": "GET"
+                        },
+                        "formatSettings": {
+                            "type": "BinaryReadSettings"
+                        },
+                        "datasetSettings": {
+                            "annotations": [],
+                            "type": "Binary",
+                            "typeProperties": {
+                                "location": {
+                                    "type": "HttpServerLocation",
+                                    "relativeUrl": "RAW-Product.csv"
+                                }
+                            },
+                            "externalReferences": {
+                                "connection": "e18da205-1457-4fb5-904e-7b853a0fc0c6"
+                            }
+                        }
+                    },
+                    "sink": {
+                        "type": "BinarySink",
+                        "storeSettings": {
+                            "type": "LakehouseWriteSettings"
+                        },
+                        "datasetSettings": {
+                            "annotations": [],
+                            "linkedService": {
+                                "name": "LH_STORE_RAW",
+                                "properties": {
+                                    "annotations": [],
+                                    "type": "Lakehouse",
+                                    "typeProperties": {
+                                        "workspaceId": "84912f9a-8d9a-43d0-a945-99e74142a0f2",
+                                        "artifactId": "3d020a17-ccd9-402e-9f1a-01c458a797b2",
+                                        "rootFolder": "Files"
+                                    }
+                                }
+                            },
+                            "type": "Binary",
+                            "typeProperties": {
+                                "location": {
+                                    "type": "LakehouseLocation",
+                                    "fileName": "product.csv",
+                                    "folderPath": "raw"
+                                }
+                            }
+                        }
+                    },
+                    "enableStaging": false,
+                    "enableSkipIncompatibleRow": false
                 }
-              },
-              "externalReferences": {
-                "connection": "e18da205-1457-4fb5-904e-7b853a0fc0c6"
-              },
-              "annotations": []
+            },
+            {
+                "name": "RAW-Customer",
+                "type": "Copy",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "source": {
+                        "type": "BinarySource",
+                        "storeSettings": {
+                            "type": "HttpReadSettings",
+                            "requestMethod": "GET"
+                        },
+                        "formatSettings": {
+                            "type": "BinaryReadSettings"
+                        },
+                        "datasetSettings": {
+                            "annotations": [],
+                            "type": "Binary",
+                            "typeProperties": {
+                                "location": {
+                                    "type": "HttpServerLocation",
+                                    "relativeUrl": "RAW-Customer.csv"
+                                }
+                            },
+                            "externalReferences": {
+                                "connection": "e18da205-1457-4fb5-904e-7b853a0fc0c6"
+                            }
+                        }
+                    },
+                    "sink": {
+                        "type": "BinarySink",
+                        "storeSettings": {
+                            "type": "LakehouseWriteSettings"
+                        },
+                        "datasetSettings": {
+                            "annotations": [],
+                            "linkedService": {
+                                "name": "LH_STORE_RAW",
+                                "properties": {
+                                    "annotations": [],
+                                    "type": "Lakehouse",
+                                    "typeProperties": {
+                                        "workspaceId": "84912f9a-8d9a-43d0-a945-99e74142a0f2",
+                                        "artifactId": "3d020a17-ccd9-402e-9f1a-01c458a797b2",
+                                        "rootFolder": "Files"
+                                    }
+                                }
+                            },
+                            "type": "Binary",
+                            "typeProperties": {
+                                "location": {
+                                    "type": "LakehouseLocation",
+                                    "fileName": "customer.csv",
+                                    "folderPath": "raw"
+                                }
+                            }
+                        }
+                    },
+                    "enableStaging": false,
+                    "enableSkipIncompatibleRow": false
+                }
+            },
+            {
+                "name": "RAW-Sales",
+                "type": "Copy",
+                "dependsOn": [
+                    {
+                        "activity": "RAW-Store",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "RAW-Customer",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "RAW-Product",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "source": {
+                        "type": "BinarySource",
+                        "storeSettings": {
+                            "type": "HttpReadSettings",
+                            "requestMethod": "GET"
+                        },
+                        "formatSettings": {
+                            "type": "BinaryReadSettings"
+                        },
+                        "datasetSettings": {
+                            "annotations": [],
+                            "type": "Binary",
+                            "typeProperties": {
+                                "location": {
+                                    "type": "HttpServerLocation",
+                                    "relativeUrl": "RAW-Sales.csv"
+                                }
+                            },
+                            "externalReferences": {
+                                "connection": "e18da205-1457-4fb5-904e-7b853a0fc0c6"
+                            }
+                        }
+                    },
+                    "sink": {
+                        "type": "BinarySink",
+                        "storeSettings": {
+                            "type": "LakehouseWriteSettings"
+                        },
+                        "datasetSettings": {
+                            "annotations": [],
+                            "linkedService": {
+                                "name": "LH_STORE_RAW",
+                                "properties": {
+                                    "annotations": [],
+                                    "type": "Lakehouse",
+                                    "typeProperties": {
+                                        "workspaceId": "84912f9a-8d9a-43d0-a945-99e74142a0f2",
+                                        "artifactId": "3d020a17-ccd9-402e-9f1a-01c458a797b2",
+                                        "rootFolder": "Files"
+                                    }
+                                }
+                            },
+                            "type": "Binary",
+                            "typeProperties": {
+                                "location": {
+                                    "type": "LakehouseLocation",
+                                    "fileName": "sales.csv",
+                                    "folderPath": "raw"
+                                }
+                            }
+                        }
+                    },
+                    "enableStaging": false,
+                    "enableSkipIncompatibleRow": false
+                }
+            },
+            {
+                "name": "RAW-Store",
+                "type": "Copy",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "source": {
+                        "type": "BinarySource",
+                        "storeSettings": {
+                            "type": "HttpReadSettings",
+                            "requestMethod": "GET"
+                        },
+                        "formatSettings": {
+                            "type": "BinaryReadSettings"
+                        },
+                        "datasetSettings": {
+                            "annotations": [],
+                            "type": "Binary",
+                            "typeProperties": {
+                                "location": {
+                                    "type": "HttpServerLocation",
+                                    "relativeUrl": "RAW-Store.csv"
+                                }
+                            },
+                            "externalReferences": {
+                                "connection": "e18da205-1457-4fb5-904e-7b853a0fc0c6"
+                            }
+                        }
+                    },
+                    "sink": {
+                        "type": "BinarySink",
+                        "storeSettings": {
+                            "type": "LakehouseWriteSettings"
+                        },
+                        "datasetSettings": {
+                            "annotations": [],
+                            "linkedService": {
+                                "name": "LH_STORE_RAW",
+                                "properties": {
+                                    "annotations": [],
+                                    "type": "Lakehouse",
+                                    "typeProperties": {
+                                        "workspaceId": "84912f9a-8d9a-43d0-a945-99e74142a0f2",
+                                        "artifactId": "3d020a17-ccd9-402e-9f1a-01c458a797b2",
+                                        "rootFolder": "Files"
+                                    }
+                                }
+                            },
+                            "type": "Binary",
+                            "typeProperties": {
+                                "location": {
+                                    "type": "LakehouseLocation",
+                                    "fileName": "store.csv",
+                                    "folderPath": "raw"
+                                }
+                            }
+                        }
+                    },
+                    "enableStaging": false,
+                    "enableSkipIncompatibleRow": false
+                }
             }
-          },
-          "sink": {
-            "type": "BinarySink",
-            "storeSettings": {
-              "type": "LakehouseWriteSettings"
-            },
-            "datasetSettings": {
-              "type": "Binary",
-              "typeProperties": {
-                "location": {
-                  "type": "LakehouseLocation",
-                  "folderPath": "raw",
-                  "fileName": "product.csv"
-                }
-              },
-              "linkedService": {
-                "name": "LH_STORE_RAW",
-                "properties": {
-                  "type": "Lakehouse",
-                  "typeProperties": {
-                    "artifactId": "58a797b2-01c4-9f1a-402e-ccd93d020a17",
-                    "workspaceId": "00000000-0000-0000-0000-000000000000",
-                    "rootFolder": "Files"
-                  },
-                  "annotations": []
-                }
-              },
-              "annotations": []
-            }
-          },
-          "enableStaging": false,
-          "enableSkipIncompatibleRow": false
-        },
-        "policy": {
-          "timeout": "0.12:00:00",
-          "retry": 0,
-          "retryIntervalInSeconds": 30,
-          "secureInput": false,
-          "secureOutput": false
-        },
-        "name": "RAW-Product",
-        "dependsOn": []
-      },
-      {
-        "type": "Copy",
-        "typeProperties": {
-          "source": {
-            "type": "BinarySource",
-            "formatSettings": {
-              "type": "BinaryReadSettings"
-            },
-            "storeSettings": {
-              "type": "HttpReadSettings",
-              "requestMethod": "GET"
-            },
-            "datasetSettings": {
-              "type": "Binary",
-              "typeProperties": {
-                "location": {
-                  "type": "HttpServerLocation",
-                  "relativeUrl": "RAW-Customer.csv"
-                }
-              },
-              "externalReferences": {
-                "connection": "e18da205-1457-4fb5-904e-7b853a0fc0c6"
-              },
-              "annotations": []
-            }
-          },
-          "sink": {
-            "type": "BinarySink",
-            "storeSettings": {
-              "type": "LakehouseWriteSettings"
-            },
-            "datasetSettings": {
-              "type": "Binary",
-              "typeProperties": {
-                "location": {
-                  "type": "LakehouseLocation",
-                  "folderPath": "raw",
-                  "fileName": "customer.csv"
-                }
-              },
-              "linkedService": {
-                "name": "LH_STORE_RAW",
-                "properties": {
-                  "type": "Lakehouse",
-                  "typeProperties": {
-                    "artifactId": "58a797b2-01c4-9f1a-402e-ccd93d020a17",
-                    "workspaceId": "00000000-0000-0000-0000-000000000000",
-                    "rootFolder": "Files"
-                  },
-                  "annotations": []
-                }
-              },
-              "annotations": []
-            }
-          },
-          "enableStaging": false,
-          "enableSkipIncompatibleRow": false
-        },
-        "policy": {
-          "timeout": "0.12:00:00",
-          "retry": 0,
-          "retryIntervalInSeconds": 30,
-          "secureInput": false,
-          "secureOutput": false
-        },
-        "name": "RAW-Customer",
-        "dependsOn": []
-      },
-      {
-        "type": "Copy",
-        "typeProperties": {
-          "source": {
-            "type": "BinarySource",
-            "formatSettings": {
-              "type": "BinaryReadSettings"
-            },
-            "storeSettings": {
-              "type": "HttpReadSettings",
-              "requestMethod": "GET"
-            },
-            "datasetSettings": {
-              "type": "Binary",
-              "typeProperties": {
-                "location": {
-                  "type": "HttpServerLocation",
-                  "relativeUrl": "RAW-Sales.csv"
-                }
-              },
-              "externalReferences": {
-                "connection": "e18da205-1457-4fb5-904e-7b853a0fc0c6"
-              },
-              "annotations": []
-            }
-          },
-          "sink": {
-            "type": "BinarySink",
-            "storeSettings": {
-              "type": "LakehouseWriteSettings"
-            },
-            "datasetSettings": {
-              "type": "Binary",
-              "typeProperties": {
-                "location": {
-                  "type": "LakehouseLocation",
-                  "folderPath": "raw",
-                  "fileName": "sales.csv"
-                }
-              },
-              "linkedService": {
-                "name": "LH_STORE_RAW",
-                "properties": {
-                  "type": "Lakehouse",
-                  "typeProperties": {
-                    "artifactId": "58a797b2-01c4-9f1a-402e-ccd93d020a17",
-                    "workspaceId": "00000000-0000-0000-0000-000000000000",
-                    "rootFolder": "Files"
-                  },
-                  "annotations": []
-                }
-              },
-              "annotations": []
-            }
-          },
-          "enableStaging": false,
-          "enableSkipIncompatibleRow": false
-        },
-        "policy": {
-          "timeout": "0.12:00:00",
-          "retry": 0,
-          "retryIntervalInSeconds": 30,
-          "secureInput": false,
-          "secureOutput": false
-        },
-        "name": "RAW-Sales",
-        "dependsOn": [
-          {
-            "activity": "RAW-Store",
-            "dependencyConditions": [
-              "Succeeded"
-            ]
-          },
-          {
-            "activity": "RAW-Customer",
-            "dependencyConditions": [
-              "Succeeded"
-            ]
-          },
-          {
-            "activity": "RAW-Product",
-            "dependencyConditions": [
-              "Succeeded"
-            ]
-          }
         ]
-      },
-      {
-        "type": "Copy",
-        "typeProperties": {
-          "source": {
-            "type": "BinarySource",
-            "formatSettings": {
-              "type": "BinaryReadSettings"
-            },
-            "storeSettings": {
-              "type": "HttpReadSettings",
-              "requestMethod": "GET"
-            },
-            "datasetSettings": {
-              "type": "Binary",
-              "typeProperties": {
-                "location": {
-                  "type": "HttpServerLocation",
-                  "relativeUrl": "RAW-Store.csv"
-                }
-              },
-              "externalReferences": {
-                "connection": "e18da205-1457-4fb5-904e-7b853a0fc0c6"
-              },
-              "annotations": []
-            }
-          },
-          "sink": {
-            "type": "BinarySink",
-            "storeSettings": {
-              "type": "LakehouseWriteSettings"
-            },
-            "datasetSettings": {
-              "type": "Binary",
-              "typeProperties": {
-                "location": {
-                  "type": "LakehouseLocation",
-                  "folderPath": "raw",
-                  "fileName": "store.csv"
-                }
-              },
-              "linkedService": {
-                "name": "LH_STORE_RAW",
-                "properties": {
-                  "type": "Lakehouse",
-                  "typeProperties": {
-                    "artifactId": "58a797b2-01c4-9f1a-402e-ccd93d020a17",
-                    "workspaceId": "00000000-0000-0000-0000-000000000000",
-                    "rootFolder": "Files"
-                  },
-                  "annotations": []
-                }
-              },
-              "annotations": []
-            }
-          },
-          "enableStaging": false,
-          "enableSkipIncompatibleRow": false
-        },
-        "policy": {
-          "timeout": "0.12:00:00",
-          "retry": 0,
-          "retryIntervalInSeconds": 30,
-          "secureInput": false,
-          "secureOutput": false
-        },
-        "name": "RAW-Store",
-        "dependsOn": []
-      }
-    ]
-  }
+    }
 }
