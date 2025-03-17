@@ -1,0 +1,216 @@
+/// Calendar table
+table Calendar
+	lineageTag: bfa0074c-0a44-4a9c-8bba-c87af778b3d7
+
+	column Day
+		dataType: int64
+		formatString: 0
+		lineageTag: 15ee1357-a55a-4206-b87f-4537950cefd1
+		summarizeBy: none
+		sourceColumn: Day
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = User
+
+	column Month
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 229b9d13-a91e-42b0-9d59-bf1aa3568da7
+		summarizeBy: none
+		sourceColumn: Month
+
+		changedProperty = SortByColumn
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter
+		dataType: string
+		lineageTag: 0d2804c4-111e-4544-aaf6-c6a6988e49a1
+		summarizeBy: none
+		sourceColumn: Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: e2e54129-d9ea-422d-a07a-747ce9981020
+		summarizeBy: none
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = User
+
+	column Date
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: c7ef3a60-e14b-4548-aaaa-fbeb247346f4
+		summarizeBy: none
+		sourceColumn: Date
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Month Name'
+		dataType: string
+		isHidden
+		lineageTag: 062506a9-c575-44d5-8498-18f83383b9bb
+		summarizeBy: none
+		sourceColumn: Month Name
+		sortByColumn: Month
+
+		changedProperty = SortByColumn
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year-Month
+		dataType: dateTime
+		formatString: mmm yyyy
+		lineageTag: ac2a5593-1f73-4c5a-9130-6de159221be7
+		summarizeBy: none
+		sourceColumn: Year-Month
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	column 'Week Number'
+		dataType: int64
+		formatString: 0
+		lineageTag: 0dda1383-4237-4656-ab93-717c2722f82b
+		summarizeBy: none
+		sourceColumn: Week Number
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day of Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: 32a8c46d-c4ed-4b83-a542-f6ac6ed0c3a9
+		summarizeBy: none
+		sourceColumn: Day of Week
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day Name'
+		dataType: string
+		lineageTag: 64852f77-1949-4ead-8d3c-ba5471bda0f6
+		summarizeBy: none
+		sourceColumn: Day Name
+		sortByColumn: 'Day of Week'
+
+		changedProperty = SortByColumn
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Is Weekend'
+		dataType: boolean
+		isHidden
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: ba6865ae-6e84-400d-8dda-5f8e8e62867f
+		summarizeBy: none
+		sourceColumn: Is Weekend
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fiscal Year'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 5689ae25-2b3b-4051-8540-36656934f3a5
+		summarizeBy: none
+		sourceColumn: Fiscal Year
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fiscal Quarter'
+		dataType: string
+		lineageTag: 58e95095-84d6-47f8-a9af-9ee5f1d2621b
+		summarizeBy: none
+		sourceColumn: Fiscal Quarter
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy Year-Month-Day
+		lineageTag: d00d0618-e29f-486f-a4d4-dea56417f06b
+
+		level Year
+			lineageTag: 5d3a5413-d08c-47e5-866e-894c288c29b0
+			column: Year
+
+		level Month
+			lineageTag: 4009bc63-dec6-46e9-84eb-679578b38105
+			column: Month
+
+		level Day
+			lineageTag: 6c697b75-14d3-4471-b6ad-80d79cd35f23
+			column: Day
+
+	partition Calendar-c9bc757b-0dad-4b99-8287-18a451a3c5c3 = m
+		mode: import
+		source = ```
+				let 
+				
+				    P_Today =  DateTime.LocalNow(),
+				    StartDate = #date(Date.Year(List.Min(SalesDateAdjustedAndSalesRandomized[OrderDate])), 1, 1),
+				    EndDate  = #date(Date.Year(List.Max(SalesDateAdjustedAndSalesRandomized[OrderDate])), 12, 31),  
+				
+				    // Generate a list of dates
+				    DateList = List.Dates(StartDate, Duration.Days(EndDate - StartDate) + 1, #duration(1, 0, 0, 0)),
+				
+				    // Convert list to a table
+				    Calendar = Table.FromList(DateList, Splitter.SplitByNothing(), {"Date"}),
+				
+				    // Add columns for different date attributes
+				    AddYear = Table.AddColumn(Calendar, "Year", each Date.Year([Date])),
+				    AddMonth = Table.AddColumn(AddYear, "Month", each Date.Month([Date])),
+				    AddDay = Table.AddColumn(AddMonth, "Day", each Date.Day([Date])),
+				    AddMonthName = Table.AddColumn(AddDay, "Month Name", each Date.ToText([Date], "MMM")),
+				    AddYearMonth = Table.AddColumn(AddMonthName, "Year-Month", each Text.From(Date.Year([Date])) & " " & Date.ToText([Date], "MMM")),
+				    //AddYearMonthKey = Table.AddColumn(AddYearMonth, "Year-Month Key", each Date.Year([Date]) * 100 + Date.Month([Date])),
+				    AddQuarter = Table.AddColumn(AddYearMonth, "Quarter", each "Q" & Text.From(Date.QuarterOfYear([Date]))),
+				    AddWeek = Table.AddColumn(AddQuarter, "Week Number", each Date.WeekOfYear([Date])),
+				    AddDayOfWeek = Table.AddColumn(AddWeek, "Day of Week", each Date.DayOfWeek([Date]) + 1),
+				    AddDayName = Table.AddColumn(AddDayOfWeek, "Day Name", each Date.ToText([Date], "dddd")),
+				    AddIsWeekend = Table.AddColumn(AddDayName, "Is Weekend", each if Date.DayOfWeek([Date]) >= 5 then true else false),
+				
+				    // Add fiscal year and period adjustments
+				    AddFiscalYear = Table.AddColumn(AddIsWeekend, "Fiscal Year", each if Date.Month([Date]) >= 7 then Date.Year([Date]) + 1 else Date.Year([Date])),
+				    AddFiscalQuarter = Table.AddColumn(AddFiscalYear, "Fiscal Quarter", each "FQ" & Text.From(Number.IntegerDivide((Date.Month([Date]) + 5), 3))),
+				    #"Changed Type" = Table.TransformColumnTypes(AddFiscalQuarter,{{"Date", type date}, {"Year", Int64.Type}, {"Month", Int64.Type}, {"Day", Int64.Type}, {"Month Name", type text}, {"Year-Month", type date}, {"Quarter", type text}, {"Week Number", Int64.Type}, {"Day of Week", Int64.Type}, {"Day Name", type text}, {"Is Weekend", type logical}, {"Fiscal Year", Int64.Type}, {"Fiscal Quarter", type text}})
+				
+				in
+				    #"Changed Type"
+				```
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["MINIMIZE_POWER_QUERY_TRANSFORMATIONS"]}
+
+	annotation PBI_Id = 9eaa3654-c4d6-42e5-a057-348df1b3f460
+
+	annotation LinkedQueryName = Calendar
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

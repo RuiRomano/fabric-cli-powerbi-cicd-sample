@@ -1,0 +1,170 @@
+/// Product Catalog
+table Product
+	lineageTag: e9374b9a-faee-4f9e-b2e7-d9aafb9d6a91
+
+	measure '# Products' = COUNTROWS('Product')
+		formatString: #,##0
+		lineageTag: 1f8f1a2a-06b6-4989-8af7-212719cf3617
+
+	column ProductKey
+		dataType: int64
+		isHidden
+		isKey
+		formatString: 0
+		isAvailableInMdx: false
+		lineageTag: 4184d53e-cd2d-4cbe-b8cb-04c72a750bc4
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Manufacturer
+		dataType: string
+		lineageTag: 59e45f50-f68d-44c3-becd-70ccd5a7eb7d
+		summarizeBy: none
+		sourceColumn: Manufacturer
+
+		annotation SummarizationSetBy = Automatic
+
+	column Brand
+		dataType: string
+		lineageTag: a71b235d-8f7e-4678-85a3-96a78d64bf87
+		summarizeBy: none
+		sourceColumn: Brand
+
+		annotation SummarizationSetBy = Automatic
+
+	column Color
+		dataType: string
+		lineageTag: 7054b4d0-6d93-4c96-be74-800d02d96e43
+		summarizeBy: none
+		sourceColumn: Color
+
+		annotation SummarizationSetBy = Automatic
+
+	column Weight
+		dataType: double
+		lineageTag: a6299b36-bd05-4b41-8493-e45359af237b
+		summarizeBy: none
+		sourceColumn: Weight
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Subcategory
+		dataType: string
+		lineageTag: 0a208c62-4bdd-4873-af18-ebc286c5b3bb
+		summarizeBy: none
+		sourceColumn: Subcategory
+		sortByColumn: SubcategoryCode
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category
+		dataType: string
+		lineageTag: 0f4b99cc-fdb6-4f04-b7d9-bbdcf7b2c601
+		summarizeBy: none
+		sourceColumn: Category
+		sortByColumn: CategoryCode
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductCode
+		dataType: string
+		lineageTag: 010831d3-0090-4152-bb05-cebf89f2212f
+		summarizeBy: none
+		sourceColumn: ProductCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column Product
+		dataType: string
+		lineageTag: 6a05dd5f-792b-4ab9-8d2b-278c26cdb45c
+		summarizeBy: none
+		sourceColumn: Product
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeightUnitMeasure
+		dataType: string
+		lineageTag: a50869e0-f6a8-4c63-9c5c-7936a836e495
+		summarizeBy: none
+		sourceColumn: WeightUnitMeasure
+
+		annotation SummarizationSetBy = Automatic
+
+	column UnitCost
+		dataType: double
+		lineageTag: ec9fbc9e-5058-46d6-9da8-dae2ee79f4e8
+		summarizeBy: none
+		sourceColumn: UnitCost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column UnitPrice
+		dataType: double
+		lineageTag: e5790543-e316-49da-9c36-cb1373ea4a74
+		summarizeBy: none
+		sourceColumn: UnitPrice
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column SubcategoryCode
+		dataType: string
+		isHidden
+		lineageTag: c92ca985-afa0-402e-83f3-b39e3fd01da8
+		summarizeBy: none
+		sourceColumn: SubcategoryCode
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column CategoryCode
+		dataType: string
+		isHidden
+		lineageTag: ffe16e30-d11e-43f5-a591-00aef0979209
+		summarizeBy: none
+		sourceColumn: CategoryCode
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Product Hierarchy'
+		lineageTag: 89345cc9-e735-4d62-8caf-e494a6314e93
+
+		level Category
+			lineageTag: 9ff3052d-e0de-44e8-85c3-85b8cc978936
+			column: Category
+
+		level Subcategory
+			lineageTag: 647503e7-1d2b-4e0a-bc36-1ce6bc3d81ca
+			column: Subcategory
+
+	partition Product-171f48b3-e0ea-4ea3-b9a0-c8c673eb0648 = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(Server, Database),
+				    Navigate = Source{[Schema="raw",Item="product"]}[Data],
+				    #"Renamed Columns1" = Table.RenameColumns(Navigate,{{"ProductName", "Product"}}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns1",{{"ProductKey", Int64.Type}, {"Weight", type number}, {"UnitCost", type number}, {"UnitPrice", type number}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

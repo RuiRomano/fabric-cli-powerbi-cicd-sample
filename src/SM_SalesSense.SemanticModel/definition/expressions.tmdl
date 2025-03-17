@@ -1,0 +1,63 @@
+expression Server = "x6eps4xrq2xudenlfv6naeo3i4-tixzdbe2rxiehkkfthtucqva6i.msit-datawarehouse.fabric.microsoft.com" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 39c7bef4-452b-4b29-846c-f788ef1af01f
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navigation
+
+expression SalesDateAdjustedAndSalesRandomized =
+		let
+		    Source = Sql.Database(Server, Database),
+		    Navigate = Source{[Schema="raw",Item="sales"]}[Data],
+		    #"Added Time" = Table.AddColumn(Navigate, "Time", each #time(Number.RoundDown(Number.RandomBetween(0, 23),0), Number.RoundDown(Number.RandomBetween(0, 59),0),0)),
+		    #"Changed Type" = Table.TransformColumnTypes(#"Added Time",{{"OrderDate", type date}, {"DeliveryDate", type date}, {"Quantity", Int64.Type}, {"UnitPrice", type number}, {"NetPrice", type number}, {"UnitCost", type number}}),
+		    minDate = List.Min(#"Changed Type"[OrderDate]),
+		    numYearsOnDummyData = 3,
+		    yearsDiff = (Date.Year(DateTime.LocalNow()) - numYearsOnDummyData) - Date.Year(minDate),
+		    #"AdjustDates" = Table.TransformColumns( #"Changed Type",{
+		        {"OrderDate", each Date.AddYears(_, yearsDiff)},
+		        {"DeliveryDate", each Date.AddYears(_, yearsDiff)}
+		    }),
+		    #"Added [NewQuantity]" = Table.AddColumn(#"AdjustDates", "NewQuantity", each
+		        Number.RoundDown(
+		            Number.RandomBetween(
+		                List.Max({1, [Quantity] - ([Quantity] * Randomizer)}),
+		                List.Min({[Quantity], [Quantity] + ([Quantity] * Randomizer)})
+		            )
+		        )
+		        , Int64.Type
+		    ),
+		    #"Added [NewNetPrice]" = Table.AddColumn(#"Added [NewQuantity]", "NewNetPrice", each
+		        Number.Round(
+		            Number.RandomBetween(
+		                List.Max({1, [NetPrice] - ([NetPrice] * Randomizer)}),
+		                List.Min({[NetPrice], [NetPrice] + ([NetPrice] * Randomizer)})
+		            ),
+		        3),
+		        Currency.Type
+		    ),
+		    #"Removed Columns" = Table.RemoveColumns(#"Added [NewNetPrice]",{"Quantity", "NetPrice"}),
+		    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{
+		        {"NewQuantity", "Quantity"},
+		        {"NewNetPrice", "NetPrice"}
+		    })
+		in
+		    #"Renamed Columns"
+	lineageTag: 0bd410b3-1a0d-49c7-8952-7a7465778b08
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression Randomizer = 0.6 meta [IsParameterQuery=true, Type="Number", IsParameterQueryRequired=true]
+	lineageTag: c92d2f56-fbbe-4162-b5ce-373932bf5cf2
+
+	annotation PBI_ResultType = Number
+
+expression Database = "LH_STORE_RAW" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 25b4ad98-1e27-49d2-90b3-19bff64eacf6
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+

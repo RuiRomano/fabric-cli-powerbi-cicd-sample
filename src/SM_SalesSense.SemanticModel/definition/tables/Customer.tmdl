@@ -1,0 +1,146 @@
+/// Customer data
+table Customer
+	lineageTag: 04227f5a-0aeb-4448-b5c5-dbf3e276da85
+
+	measure '# Customers' = COUNTROWS('Customer')
+		formatString: #,##0
+		lineageTag: a8dc565a-aa9b-40dc-902c-1ba2596b0977
+
+	column CustomerKey
+		dataType: int64
+		isHidden
+		isKey
+		formatString: 0
+		isAvailableInMdx: false
+		lineageTag: 901662ed-f0ae-41f6-96b3-4aa68bad1c7a
+		summarizeBy: none
+		sourceColumn: CustomerKey
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Gender
+		dataType: string
+		lineageTag: 7e0ce5eb-3e63-4870-b30a-032f5186375d
+		summarizeBy: none
+		sourceColumn: Gender
+
+		annotation SummarizationSetBy = Automatic
+
+	column Customer
+		dataType: string
+		lineageTag: 8845f8b5-b069-41a0-8af8-12e402b113e9
+		isDefaultLabel
+		summarizeBy: none
+		sourceColumn: Customer
+
+		annotation SummarizationSetBy = Automatic
+
+	column Address
+		dataType: string
+		lineageTag: adbeb074-7c67-40ee-be2d-d46775ce5e17
+		summarizeBy: none
+		sourceColumn: Address
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: a791eb8c-7fab-418d-844a-f8b094453037
+		dataCategory: City
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		dataType: string
+		lineageTag: 923b4cc1-6137-4bb4-bcb2-3a90c5f76c5e
+		dataCategory: StateOrProvince
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		lineageTag: 99af44ae-86e9-4b75-98a3-e4b6e53fe806
+		dataCategory: Country
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	column Continent
+		dataType: string
+		lineageTag: 53b840d2-962c-44c4-8733-6cc003fb9a83
+		dataCategory: Continent
+		summarizeBy: none
+		sourceColumn: Continent
+
+		annotation SummarizationSetBy = Automatic
+
+	column Birthday
+		dataType: string
+		lineageTag: afa5e191-c690-45c1-a725-41c9d3ca9434
+		summarizeBy: none
+		sourceColumn: Birthday
+
+		annotation SummarizationSetBy = Automatic
+
+	column Age = ```
+			
+			DATEDIFF(
+			    [Birthday], 
+			    TODAY(), 
+			    YEAR
+			)
+			
+			```
+		formatString: 0
+		lineageTag: eedffcae-3881-4d0d-ba45-7a5b19382fca
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column StateCode
+		dataType: string
+		lineageTag: 2fc04d74-5a7a-44df-83c7-c9b06402c900
+		summarizeBy: none
+		sourceColumn: StateCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZipCode
+		dataType: string
+		lineageTag: a02653d1-d9d5-48a3-b0df-8bb9519133f7
+		summarizeBy: none
+		sourceColumn: ZipCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column CountryCode
+		dataType: string
+		lineageTag: 3d0ed32b-d6c6-49c1-a8c5-0db8ed0cc0b0
+		summarizeBy: none
+		sourceColumn: CountryCode
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Customer-3757b886-e26c-4cec-a550-cdeea37b94d4 = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(Server, Database),
+				    Navigate = Source{[Schema="raw",Item="customer"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(Navigate,{{"Name", "Customer"}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Renamed Columns",{"Age"}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Removed Columns",{{"CustomerKey", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

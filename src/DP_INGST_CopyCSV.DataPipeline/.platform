@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "DP_INGST_CopyCSV"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "8ef06d5a-e1f1-bfdf-416b-c1a104bf7542"
+  }
+}

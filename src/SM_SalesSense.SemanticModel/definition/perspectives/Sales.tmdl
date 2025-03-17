@@ -1,0 +1,60 @@
+perspective Sales
+
+	perspectiveTable Sales
+
+		perspectiveMeasure '# Customers (w/ Sales)'
+
+		perspectiveMeasure '# Products (w/ Sales)'
+
+		perspectiveMeasure 'Sales Qty'
+
+		perspectiveMeasure 'Sales Amount'
+
+		perspectiveMeasure 'Sales Amount  (Δ LY)'
+
+		perspectiveMeasure 'Sales Amount (LY)'
+
+		perspectiveMeasure 'Sales Amount (YTD, LY)'
+
+		perspectiveMeasure 'Sales Amount (YTD)'
+
+		perspectiveMeasure 'Sales Amount Avg per Day'
+
+		perspectiveMeasure 'Sales Amount  (% Δ LY)'
+
+		perspectiveMeasure Margin
+
+		perspectiveMeasure 'Margin (ly)'
+
+		perspectiveMeasure '# Sales'
+
+		perspectiveMeasure 'Sales Qty by Delivery Date'
+
+		perspectiveMeasure 'Sales Amount (12M average)'
+
+		perspectiveMeasure 'Sales Amount (6M average)'
+
+		perspectiveColumn CustomerKey
+
+		perspectiveColumn StoreKey
+
+		perspectiveColumn ProductKey
+
+	perspectiveTable Product
+
+		perspectiveMeasure '# Products'
+
+		perspectiveColumn ProductKey
+
+		perspectiveColumn Manufacturer
+
+		perspectiveColumn Brand
+
+		perspectiveColumn Color
+
+		perspectiveColumn Weight
+
+		perspectiveColumn Subcategory
+
+		perspectiveColumn Category
+

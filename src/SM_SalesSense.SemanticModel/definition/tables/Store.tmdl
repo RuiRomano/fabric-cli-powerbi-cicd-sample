@@ -1,0 +1,109 @@
+/// Store metadata
+table Store
+	lineageTag: 54d5f884-12db-4e03-a120-08cd725db2c4
+
+	measure '# Stores' = COUNTROWS('Store')
+		formatString: #,##0
+		lineageTag: 868df9c8-f579-47d1-a776-3d29121df7c7
+
+		changedProperty = FormatString
+
+	column StoreKey
+		dataType: string
+		isHidden
+		isKey
+		isAvailableInMdx: false
+		lineageTag: b63bc7b8-266a-4424-9676-c3e68501b2ec
+		summarizeBy: none
+		sourceColumn: StoreKey
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		lineageTag: 7564fe29-ad01-43e0-ba93-2e1634e1a9b3
+		dataCategory: Country
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		dataType: string
+		lineageTag: f471c9c0-1924-46e4-99d8-59ccf0f64cba
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+	column Store
+		dataType: string
+		lineageTag: 7bee915f-7eb7-4dbc-a16f-e796f410b3f5
+		isDefaultLabel
+		summarizeBy: none
+		sourceColumn: Store
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: 93122991-3d6a-413c-ad26-3610fa90013b
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column = [Store] & "SSS"
+		lineageTag: b138b933-8625-4540-b559-c52fff37af8e
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column StoreCode
+		dataType: string
+		lineageTag: 423be286-f0bf-4bc4-814a-f9019b83d98b
+		summarizeBy: none
+		sourceColumn: StoreCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column SquareMeters
+		dataType: string
+		lineageTag: 83def29d-665d-4081-92b9-1475d8f3e284
+		summarizeBy: none
+		sourceColumn: SquareMeters
+
+		annotation SummarizationSetBy = Automatic
+
+	column OpenDate
+		dataType: string
+		lineageTag: 5b56d7b4-57a2-4d50-92ad-a31f6d3662e9
+		summarizeBy: none
+		sourceColumn: OpenDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column CloseDate
+		dataType: string
+		lineageTag: 61703368-c485-4a19-89c8-81a32d4c35ba
+		summarizeBy: none
+		sourceColumn: CloseDate
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Store-c0e5ba98-f95a-4712-91ec-71c7dc35e177 = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(Server, Database),
+				    Navigate = Source{[Schema="raw",Item="store"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(Navigate,{{"Name", "Store"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

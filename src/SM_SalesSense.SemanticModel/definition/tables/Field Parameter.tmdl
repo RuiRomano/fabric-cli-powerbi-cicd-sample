@@ -1,0 +1,55 @@
+table 'Field Parameter'
+	lineageTag: 29294de5-e93a-47f4-bd78-26ec8efe7786
+
+	column 'Field Parameter'
+		lineageTag: f29057e2-1184-48f8-b6c5-08f85cfd5ec1
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Field Parameter Order'
+
+		relatedColumnDetails
+			groupByColumn: 'Field Parameter Fields'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Field Parameter Fields'
+		isHidden
+		lineageTag: dc604c44-bcb1-44cd-acb7-55201a651d63
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Field Parameter Order'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Field Parameter Order'
+		isHidden
+		formatString: 0
+		lineageTag: 2102f8c8-0503-42f5-ac07-b1a606810a4a
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Field Parameter' = calculated
+		mode: import
+		source =
+				{
+				    ("Customer", NAMEOF('Customer'[Customer]), 0),
+				    ("Product", NAMEOF('Product'[Product]), 1),
+				    ("Store", NAMEOF('Store'[Store]), 2),
+				    ("# Sales", NAMEOF([# Sales]), 10),
+				    ("# Products (with Sales)", NAMEOF([# Products (w/ Sales)]), 11),
+				    ("# Customers (with Sales)", NAMEOF([# Customers (w/ Sales)]), 12),
+				    ("Margin", NAMEOF([Margin]), 13),
+				    ("Sales Amount", NAMEOF([Sales Amount]), 14),
+				    ("Sales Qty", NAMEOF([Sales Qty]), 15)
+				}
+
+	annotation PBI_Id = fb0b744d500c4fe187fc782efa6004bb
+

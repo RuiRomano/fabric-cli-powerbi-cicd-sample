@@ -1,0 +1,44 @@
+cultureInfo pt-PT
+	translations
+		model Model
+			table Sales
+				caption: Vendas
+				measure 'Sales Qty'
+					caption: Qtd Vendas
+				measure 'Sales Amount'
+					caption: Total de Vendas
+				measure Margin
+					caption: Margem
+					description: Margem Bruta
+				measure '# Sales'
+					caption: Qtd Vendas
+			table Product
+				caption: Produto
+				column ProductKey
+					caption: Chave de Produto
+				column Manufacturer
+					caption: Fabricante
+				column Color
+					caption: Cor
+				column Weight
+					caption: Peso
+				column Subcategory
+					caption: Sub-Categoria
+			table Customer
+				caption: Cliente
+			table Store
+				caption: Loja
+				column Store
+					caption: Loja
+					description: Nome de Loja
+			table About
+				caption: Sobre
+
+	annotation 'New Annotation'
+
+	annotation 'New Annotation 1'
+
+	annotation 'New Annotation 2'
+
+	annotation 'New Annotation 3' = xxxx
+
