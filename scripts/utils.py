@@ -7,7 +7,10 @@ import json
 current_folder = os.path.dirname(__file__)
 debug = False
 
-def fab_authenticate_spn(client_id: str = None, client_secret: str = None, tenant_id: str = None):
+
+def fab_authenticate_spn(
+    client_id: str = None, client_secret: str = None, tenant_id: str = None
+):
     """
     Authenticates with a Service Principal Name (SPN) using environment variables.
     This function retrieves the client ID, client secret, and tenant ID from the environment
@@ -21,8 +24,8 @@ def fab_authenticate_spn(client_id: str = None, client_secret: str = None, tenan
     """
 
     print("Authenticating with SPN")
-    
-    if (client_id is None or client_secret is None or tenant_id is None):
+
+    if client_id is None or client_secret is None or tenant_id is None:
         client_id = os.getenv("FABRIC_CLIENT_ID")
         client_secret = os.getenv("FABRIC_CLIENT_SECRET")
         tenant_id = os.getenv("FABRIC_TENANT_ID")
@@ -41,7 +44,10 @@ def fab_authenticate_spn(client_id: str = None, client_secret: str = None, tenan
 
 
 def run_fab_command(
-    command, capture_output: bool = False, include_secrets: bool = False, silently_continue: bool = False
+    command,
+    capture_output: bool = False,
+    include_secrets: bool = False,
+    silently_continue: bool = False,
 ):
     """
     Executes a Fabric command.
@@ -58,13 +64,17 @@ def run_fab_command(
     if debug and not include_secrets:
         print(f"Running fab command: {command}")
 
-    result = subprocess.run(["fab", "-c", command], capture_output=capture_output, text=True)
+    result = subprocess.run(
+        ["fab", "-c", command], capture_output=capture_output, text=True
+    )
 
-    if (not(silently_continue) and (result.returncode > 0 or result.stderr)):
-        raise Exception(f"Error running fab command. exit_code: '{result.returncode}'; stderr: '{result.stderr}'")    
+    if not (silently_continue) and (result.returncode > 0 or result.stderr):
+        raise Exception(
+            f"Error running fab command. exit_code: '{result.returncode}'; stderr: '{result.stderr}'"
+        )
 
-    if (capture_output):
-        
+    if capture_output:
+
         output = result.stdout.strip()
 
         return output
@@ -99,9 +109,12 @@ def create_workspace(workspace_name, capacity_name: str = "none", upns: list = N
             print(f"Adding UPNs")
 
             for upn in upns:
-                run_fab_command(f"acl set -f /{workspace_name}.Workspace -I {upn} -R admin")
+                run_fab_command(
+                    f"acl set -f /{workspace_name}.Workspace -I {upn} -R admin"
+                )
 
     print(f"::endgroup::")
+
 
 def deploy_semanticmodel(
     path,
@@ -127,7 +140,7 @@ def deploy_semanticmodel(
     staging_path = copy_to_staging(path)
 
     if semanticmodel_parameters is not None:
-        # Update semantic model definition with new parameters        
+        # Update semantic model definition with new parameters
         update_semanticmodel_definition(staging_path, semanticmodel_parameters)
 
     if semanticmodel_name is None:
@@ -221,7 +234,7 @@ def deploy_report(
     # Only for PBIR
 
     if os.path.exists(os.path.join(staging_path, "definition")):
-        
+
         # Ensure default page
 
         report_json = read_pbip_jsonfile(
@@ -246,9 +259,11 @@ def deploy_report(
 
                 pages_json["activePageName"] = defaultPage
 
-                with open(os.path.join(staging_path, "definition", "pages", "pages.json"), "w") as file:
+                with open(
+                    os.path.join(staging_path, "definition", "pages", "pages.json"), "w"
+                ) as file:
                     json.dump(pages_json, file, indent=4)
-            
+
     # Deploy report
 
     run_fab_command(
