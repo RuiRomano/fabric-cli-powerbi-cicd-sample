@@ -26,11 +26,15 @@ on:
         type: string
         required: true
         default: 'CAT_Premium_Europe'
+      admin_upns:
+        type: string
+        required: true
+        default: ''
   
 env:        
   workspace: ${{ github.event.inputs.workspace == '' && 'SalesSense' || github.event.inputs.workspace }}
   capacity: ${{ github.event.inputs.capacity == '' && 'none' || github.event.inputs.capacity }}
-  admin_upns: ${{ vars.ADMIN_UPNS }}
+  admin_upns: ${{ github.event.inputs.admin_upns == '' && vars.ADMIN_UPNS || github.event.inputs.admin_upns }}  
 
 jobs:
 
