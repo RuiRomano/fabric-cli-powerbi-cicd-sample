@@ -24,16 +24,16 @@ on:
         default: 'SalesSense'
       capacity:
         type: string
-        required: true
-        default: 'CAT_Premium_Europe'
+        required: false
+        default: ''
       admin_upns:
         type: string
-        required: true
+        required: false
         default: ''
   
 env:        
   workspace: ${{ github.event.inputs.workspace == '' && 'SalesSense' || github.event.inputs.workspace }}
-  capacity: ${{ github.event.inputs.capacity == '' && 'none' || github.event.inputs.capacity }}
+  capacity: ${{ github.event.inputs.capacity == '' && vars.CAPACITY || github.event.inputs.capacity }}
   admin_upns: ${{ github.event.inputs.admin_upns == '' && vars.ADMIN_UPNS || github.event.inputs.admin_upns }}  
 
 jobs:
