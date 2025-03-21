@@ -75,7 +75,7 @@ def run_fab_command(
 
     if capture_output:
 
-        output = result.stdout.strip()
+        output = result.stdout.strip().split("\n")[-1]
 
         return output
 
@@ -113,173 +113,133 @@ def create_workspace(workspace_name, capacity_name: str = "none", upns: list = N
                     f"acl set -f /{workspace_name}.Workspace -I {upn} -R admin"
                 )
 
-    print(f"::endgroup::")
-
-
-def deploy_semanticmodel(
-    path,
-    workspace_name,
-    semanticmodel_name: str = None,
-    semanticmodel_parameters: dict = None,
-):
-    """
-    Deploys a semantic model to a specified workspace.
-    Args:
-        path (str): The file path to the semantic model.
-        workspace_name (str): The name of the workspace where the semantic model will be deployed.
-        semanticmodel_name (str, optional): The name of the semantic model. If not provided, it will be read from the platform properties.
-        semanticmodel_parameters (dict, optional): A dictionary of parameters to update the semantic model definition.
-    Returns:
-        str: The ID of the deployed semantic model.
-    """
-
-    print(f"::group::Deploying semantic model: {path}")
-
-    # Create a staging copy of the semantic model for manipulation before publish
-
-    staging_path = copy_to_staging(path)
-
-    if semanticmodel_parameters is not None:
-        # Update semantic model definition with new parameters
-        update_semanticmodel_definition(staging_path, semanticmodel_parameters)
-
-    if semanticmodel_name is None:
-
-        # Read platform properties if name is not supplied
-
-        platform_data = read_pbip_jsonfile(os.path.join(staging_path, ".platform"))
-
-        semanticmodel_name = platform_data["metadata"]["displayName"]
-
-    # Deploy semantic model
-
-    run_fab_command(
-        f"import -f /{workspace_name}.workspace/{semanticmodel_name}.semanticmodel -i {staging_path}"
-    )
-
-    # Get semantic model id
-
-    semanticmodel_id = run_fab_command(
-        f"get /{workspace_name}.workspace/{semanticmodel_name}.semanticmodel -q id",
-        capture_output=True,
+    workspace_id = run_fab_command(
+        f"get /{workspace_name}.Workspace -q id", capture_output=True
     )
 
     print(f"::endgroup::")
 
-    return semanticmodel_id
+    return workspace_id
 
 
-def deploy_report(
-    path, workspace_name, report_name: str = None, semanticmodel_id: str = None
-):
-    """
-    Deploys a Power BI report to a specified workspace.
-    Args:
-        path (str): The file path to the report to be deployed.
-        workspace_name (str): The name of the workspace where the report will be deployed.
-        report_name (str, optional): The name of the report. If not provided, the name will be read from the platform properties.
-        semanticmodel_id (str, optional): The ID of the semantic model to connect the report to. If provided, the report will be connected to this semantic model.
-    Returns:
-        str: The ID of the deployed report.
-    Raises:
-        Exception: If the report definition does not have a 'byConnection' configuration and 'semanticmodel_id' is not provided.
-    """
+def create_item(
+    workspace_name: str = None,
+    item_type: str = None,
+    item_name: str = None,
+    parameters: dict = None,
+):    
 
-    print(f"::group::Deploying report: {path}")
+    print(f"::group::Creating item {workspace_name}/{item_name}.{item_type}")
 
-    # Create a staging copy of the semantic model for manipulation before publish
-
-    staging_path = copy_to_staging(path)
-
-    if not report_name:
-
-        # Read platform properties if name is not supplied
-
-        platform_data = read_pbip_jsonfile(os.path.join(staging_path, ".platform"))
-
-        report_name = platform_data["metadata"]["displayName"]
-
-    definition_path = os.path.join(staging_path, "definition.pbir")
-
-    report_definition = read_pbip_jsonfile(definition_path)
-
-    # If semantic model id is provided, overwrite the definition.pbir to ensure its connected to the provided semantic model
-
-    if semanticmodel_id:
-
-        report_definition["datasetReference"]["byPath"] = None
-
-        by_connection_obj = {
-            "connectionString": None,
-            "pbiServiceModelId": None,
-            "pbiModelVirtualServerName": "sobe_wowvirtualserver",
-            "pbiModelDatabaseName": semanticmodel_id,
-            "name": "EntityDataSource",
-            "connectionType": "pbiServiceXmlaStyleLive",
-        }
-
-        report_definition["datasetReference"]["byConnection"] = by_connection_obj
-
-        with open(definition_path, "w") as file:
-            json.dump(report_definition, file, indent=4)
+    if parameters:
+        param_str = ",".join(f"{key}={value}" for key, value in parameters.items())
+        param_str = f"-P {param_str}"
     else:
-        if not (
-            "datasetReference" in report_definition
-            and "byConnection" in report_definition["datasetReference"]
-        ):
-            raise Exception(
-                "Report 'definition.pbir' must have a 'byConnection' configuration. Use of 'bypath' is not supported when importing report with API."
-            )
-
-    # Only for PBIR
-
-    if os.path.exists(os.path.join(staging_path, "definition")):
-
-        # Ensure default page
-
-        report_json = read_pbip_jsonfile(
-            os.path.join(staging_path, "definition", "report.json")
+        param_str = ""
+    
+    if (item_type == "connection"):
+        run_fab_command(
+            f"create .connections/{item_name}.Connection {param_str}",
+            silently_continue=True,
         )
 
-        if "annotations" in report_json:
+        item_id = run_fab_command(
+            f"get .connections/{item_name}.Connection -q id", capture_output=True
+        )
+    else:
+        run_fab_command(
+            f"create /{workspace_name}.workspace/{item_name}.{item_type} {param_str}",
+            silently_continue=True,
+        )
 
-            defaultPageAnnotation = [
-                x for x in report_json["annotations"] if x["name"] == "defaultPage"
-            ]
-
-            if defaultPageAnnotation:
-
-                defaultPage = defaultPageAnnotation[0]["value"]
-
-                print(f"Setting default page to '{defaultPage}'")
-
-                pages_json = read_pbip_jsonfile(
-                    os.path.join(staging_path, "definition", "pages", "pages.json")
-                )
-
-                pages_json["activePageName"] = defaultPage
-
-                with open(
-                    os.path.join(staging_path, "definition", "pages", "pages.json"), "w"
-                ) as file:
-                    json.dump(pages_json, file, indent=4)
-
-    # Deploy report
-
-    run_fab_command(
-        f"import -f /{workspace_name}.workspace/{report_name}.report -i {staging_path}"
-    )
-
-    # Get report id
-
-    report_id = run_fab_command(
-        f"get /{workspace_name}.workspace/{report_name}.report -q id",
-        capture_output=True,
-    )
+        item_id = run_fab_command(
+            f"get /{workspace_name}.workspace/{item_name}.{item_type} -q id",
+            capture_output=True,
+        )
 
     print(f"::endgroup::")
 
-    return report_id
+    return item_id
+
+
+def deploy_item(
+    src_path,
+    workspace_name,
+    item_type: str = None,
+    item_name: str = None,
+    find_and_replace: dict = None,
+    what_if: bool = False,
+    func_after_staging=None,
+):
+    print(f"::group::Deploying {src_path}")
+
+    staging_path = copy_to_staging(src_path)
+
+    # Call function that provides flexibility to change something in the staging files
+
+    if func_after_staging:
+        func_after_staging(staging_path)
+
+    if os.path.exists(os.path.join(staging_path, ".platform")):
+
+        with open(os.path.join(staging_path, ".platform"), "r") as file:
+            platform_data = json.load(file)        
+
+        if item_name is None:
+            item_name = platform_data["metadata"]["displayName"]
+
+        if item_type is None:
+            item_type = platform_data["metadata"]["type"]
+
+        # Loop through all files and apply the find & replace with regular expressions
+
+        if find_and_replace:
+
+            for root, _, files in os.walk(staging_path):
+                for file in files:
+
+                    file_path = os.path.join(root, file)
+
+                    with open(file_path, "r") as file:
+                        text = file.read()
+
+                    # Loop parameters and execute the find & replace in the ones that match the file path
+
+                    for key, replace_value in find_and_replace.items():
+
+                        find_and_replace_file_filter = key[0]
+
+                        find_and_replace_file_find = key[1]
+
+                        if re.search(find_and_replace_file_filter, file_path):
+                            text, count_subs = re.subn(
+                                find_and_replace_file_find, replace_value, text
+                            )
+
+                            if count_subs > 0:
+
+                                print(
+                                    f"Find & replace in file '{file_path}' with regex '{find_and_replace_file_find}'"
+                                )
+
+                                with open(file_path, "w") as file:
+                                    file.write(text)
+
+    if not what_if:
+        run_fab_command(
+            f"import -f /{workspace_name}.workspace/{item_name}.{item_type} -i {staging_path}"
+        )
+
+        # Return id after deployment
+
+        item_id = run_fab_command(
+            f"get /{workspace_name}.workspace/{item_name}.{item_type} -q id",
+            capture_output=True,
+        )
+
+        return item_id
+
+    print(f"::endgroup::")
 
 
 def copy_to_staging(path):
@@ -308,80 +268,3 @@ def copy_to_staging(path):
     shutil.copytree(path, path_staging, dirs_exist_ok=True)
 
     return path_staging
-
-
-def update_semanticmodel_definition(path, parameters: dict):
-    """
-    Updates the semantic model definition file with the provided parameters.
-    This function reads the 'expressions.tmdl' file located in the given path,
-    updates the expressions with the provided parameters, and writes the updated
-    content back to the file.
-    Args:
-        path (str): The directory path where the 'definition' folder containing 'expressions.tmdl' is located.
-        parameters (dict): A dictionary of parameters to update in the format {parameter_name: new_value}.
-    Raises:
-        Exception: If the 'expressions.tmdl' file does not exist or cannot be found.
-    """
-
-    print(f"Updating semantic model definition: {path}")
-
-    file_path = os.path.join(path, "definition", "expressions.tmdl")
-
-    if os.path.exists(file_path):
-        with open(file_path, "r") as file:
-            text = file.read()
-
-    if text:
-
-        for key, value in parameters.items():
-
-            print(f"Updating parameter '{key}'")
-
-            text = re.sub(rf'(expression\s+{key}\s*=\s*)(".*?")', rf'\1"{value}"', text)
-
-        with open(file_path, "w") as file:
-            file.write(text)
-    else:
-        raise Exception("Cannot find expressions.tmdl")
-
-
-def read_platform_file(path):
-    """
-    Reads the .platform file from the specified directory and returns its contents as a dictionary.
-    Args:
-        path (str): The directory path where the .platform file is located.
-    Returns:
-        dict: The contents of the .platform file.
-    Raises:
-        Exception: If the .platform file does not exist in the specified directory.
-    """
-
-    platform_file_path = os.path.join(path, ".platform")
-
-    if not os.path.exists(platform_file_path):
-        raise Exception(f"Cannot find .platform file: '{platform_file_path}'")
-
-    with open(platform_file_path, "r") as platform_file:
-        platform_data = json.load(platform_file)
-
-        return platform_data
-
-
-def read_pbip_jsonfile(path):
-    """
-    Reads a JSON file from the specified path and returns its contents as a dictionary.
-    Args:
-        path (str): The file path to the JSON file.
-    Returns:
-        dict: The contents of the JSON file.
-    Raises:
-        Exception: If the file does not exist at the specified path.
-    """
-
-    if not os.path.exists(path):
-        raise Exception(f"Cannot find file: '{path}'")
-
-    with open(path, "r") as file:
-        data = json.load(file)
-
-    return data

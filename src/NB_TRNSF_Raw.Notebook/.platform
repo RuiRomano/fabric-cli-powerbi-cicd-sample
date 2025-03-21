@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
-  "metadata": {
-    "type": "Notebook",
-    "displayName": "NB_TRNSF_Raw",
-    "description": "New notebook"
-  },
-  "config": {
-    "version": "2.0",
-    "logicalId": "9d621ccd-81a5-9644-4291-3fd8b2e8c949"
-  }
+    "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+    "metadata": {
+        "type": "Notebook",
+        "displayName": "NB_TRNSF_Raw",
+        "description": "New notebook"
+    },
+    "config": {
+        "version": "2.0",
+        "logicalId": "00000000-0000-0000-0000-000000000000"
+    }
 }

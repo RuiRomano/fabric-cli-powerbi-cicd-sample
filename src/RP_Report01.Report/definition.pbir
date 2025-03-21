@@ -3,6 +3,7 @@
   "datasetReference": {
     "byPath": {
       "path": "../SM_SalesSense.SemanticModel"
-    }
+    },
+    "byConnection": null
   }
 }

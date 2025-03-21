@@ -1,0 +1,60 @@
+name: deploy
+  
+on:
+
+  # Deploys to DEV on push to main branch
+
+  # push:
+  #   branches:
+  #     - main           
+  #   paths:
+  #     - '**/src/**'           
+    
+  # Deploys to PRD every day
+
+  # schedule:
+  #   - cron: "0 0 * * *"   # Every day at 00:00
+  #   #- cron: "*/10 * * * *"   # Every 10 minutes (debug)
+    
+  workflow_dispatch:
+    inputs:
+      workspace:
+        type: string
+        required: true
+        default: 'SalesSense'
+      capacity:
+        type: string
+        required: true
+        default: 'none'
+  
+env:        
+  workspace: ${{ github.event.inputs.workspace == '' && 'SalesSense' || github.event.inputs.workspace }}
+  capacity: ${{ github.event.inputs.workspace == '' && 'none' || github.event.inputs.workspace }}
+  admin_upns: ${{ vars.ADMIN_UPNS }}
+
+jobs:
+
+  deploy:    
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.12"
+
+      - name: Install Fabric CLI
+        run: |
+          python -m pip install dist/fabric_cli-0.1.8-py3-none-any.whl
+
+      - name: Run Deployment Script
+        env:
+          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
+          FABRIC_CLIENT_SECRET: ${{ secrets.FABRIC_CLIENT_SECRET }}
+          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}          
+        run: |
+          python scripts/deploy-dev.py --spn-auth --capacity $capacity --workspace $workspace --admin-upns $admin_upns"
+   
