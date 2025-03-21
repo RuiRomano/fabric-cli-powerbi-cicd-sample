@@ -29,7 +29,7 @@ on:
   
 env:        
   workspace: ${{ github.event.inputs.workspace == '' && 'SalesSense' || github.event.inputs.workspace }}
-  capacity: ${{ github.event.inputs.workspace == '' && 'none' || github.event.inputs.workspace }}
+  capacity: ${{ github.event.inputs.capacity == '' && 'none' || github.event.inputs.capacity }}
   admin_upns: ${{ vars.ADMIN_UPNS }}
 
 jobs:
