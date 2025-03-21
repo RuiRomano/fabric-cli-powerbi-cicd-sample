@@ -25,7 +25,7 @@ on:
       capacity:
         type: string
         required: true
-        default: 'none'
+        default: 'CAT_Premium_Europe'
   
 env:        
   workspace: ${{ github.event.inputs.workspace == '' && 'SalesSense' || github.event.inputs.workspace }}
