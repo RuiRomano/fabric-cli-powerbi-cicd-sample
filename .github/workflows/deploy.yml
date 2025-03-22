@@ -68,5 +68,5 @@ jobs:
           FABRIC_CLIENT_SECRET: ${{ secrets.FABRIC_CLIENT_SECRET }}
           FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}          
         run: 
-          python scripts/deploy-${{ github.event.inputs.environment }}.py --spn-auth --capacity $capacity --workspace $workspace --admin-upns $admin_upns
+          python scripts/deploy-$environment.py --spn-auth --capacity $capacity --workspace $workspace --admin-upns $admin_upns
       
