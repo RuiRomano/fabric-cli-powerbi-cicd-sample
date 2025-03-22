@@ -4,11 +4,11 @@ on:
 
   # Deploys to DEV on push to main branch
 
-  # push:
-  #   branches:
-  #     - main           
-  #   paths:
-  #     - '**/src/**'           
+  push:
+    branches:
+      - main           
+    paths:
+      - '**/src/**'           
     
   # Deploys to PRD every day
 
@@ -17,6 +17,13 @@ on:
     
   workflow_dispatch:
     inputs:
+      environment:
+        type: choice        
+        required: true
+        default: 'dev'
+        options: 
+        - dev   
+        - prd 
       workspace:
         type: string
         required: true
@@ -31,6 +38,8 @@ on:
         default: ''
   
 env:        
+  # If its running on schedule deploys to PRD, otherwise goes to DEV
+  environment: ${{ github.event.inputs.environment == '' && (github.event_name == 'schedule' && 'prd' || 'dev') || github.event.inputs.environment }}
   workspace: ${{ github.event.inputs.workspace == '' && 'SalesSense' || github.event.inputs.workspace }}
   capacity: ${{ github.event.inputs.capacity == '' && vars.FABRIC_CAPACITY || github.event.inputs.capacity }}
   admin_upns: ${{ github.event.inputs.admin_upns == '' && vars.FABRIC_ADMIN_UPNS || github.event.inputs.admin_upns }}  
@@ -53,10 +62,11 @@ jobs:
         run: |
           python -m pip install cli/fabric_cli-0.1.8-py3-none-any.whl
 
-      - name: Run Deployment Script
+      - name: Run Deployment Script {Dev}        
         env:
           FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
           FABRIC_CLIENT_SECRET: ${{ secrets.FABRIC_CLIENT_SECRET }}
           FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}          
         run: 
-          python scripts/deploy-dev.py --spn-auth --capacity $capacity --workspace $workspace --admin-upns $admin_upns
+          python scripts/deploy-${{ github.event.inputs.environment }}.py --spn-auth --capacity $capacity --workspace $workspace --admin-upns $admin_upns
+      
