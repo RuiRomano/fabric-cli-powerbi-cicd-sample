@@ -6,7 +6,7 @@ This repository demonstrates a CICD scenario using [Fabric CLI](https://github.c
 ## Run with GitHub actions
 
 - Fork this repo.
-- Configure [Github secrets and variables](#secrets-and-variables)
+- Configure required [Github secrets and variables](#secrets-and-variables)
 - Run the [deploy](/.github/workflows/deploy.yml) Github workflow.
 
 ## Run scripts locally
@@ -22,7 +22,7 @@ Before running the Github Action, ensure you configure the following [GitHub act
 
 | Name            | Type   | Value                |
 |-----------------|--------|----------------------|
-| `FABRIC_CLIENT_ID`       | Secret | Service Principal client ID from your tenant   |
+| `FABRIC_CLIENT_ID`       | Secret | [Service Principal](https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal) client ID from your tenant   |
 | `FABRIC_CLIENT_SECRET`   | Secret | Service Principal secret |
 | `FABRIC_TENANT_ID` | Secret | Your tenant ID |
 | `FABRIC_ADMIN_UPNS` | Variable | User [Entra object ID](https://learn.microsoft.com/en-us/partner-center/account-settings/find-ids-and-domain-names#find-the-user-object-id) that will be assigned to the items created by the service principal |
