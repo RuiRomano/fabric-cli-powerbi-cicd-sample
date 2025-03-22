@@ -13,8 +13,7 @@ on:
   # Deploys to PRD every day
 
   # schedule:
-  #   - cron: "0 0 * * *"   # Every day at 00:00
-  #   #- cron: "*/10 * * * *"   # Every 10 minutes (debug)
+  #   - cron: "0 0 * * *"   # Every day at 00:00  
     
   workflow_dispatch:
     inputs:
