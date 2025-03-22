@@ -2,7 +2,7 @@
 table Product
 	lineageTag: e9374b9a-faee-4f9e-b2e7-d9aafb9d6a91
 
-	measure '# Products' = COUNTROWS('Product')
+	measure '# Products' = COUNTROWS('Product') * 1
 		formatString: #,##0
 		lineageTag: 1f8f1a2a-06b6-4989-8af7-212719cf3617
 
