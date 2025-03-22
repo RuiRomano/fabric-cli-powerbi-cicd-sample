@@ -82,12 +82,15 @@ table Customer
 		annotation SummarizationSetBy = Automatic
 
 	column Birthday
-		dataType: string
+		dataType: dateTime
+		formatString: Long Date
 		lineageTag: afa5e191-c690-45c1-a725-41c9d3ca9434
 		summarizeBy: none
 		sourceColumn: Birthday
 
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column Age = ```
 			
@@ -123,6 +126,7 @@ table Customer
 	column CountryCode
 		dataType: string
 		lineageTag: 3d0ed32b-d6c6-49c1-a8c5-0db8ed0cc0b0
+		dataCategory: Country
 		summarizeBy: none
 		sourceColumn: CountryCode
 
@@ -136,7 +140,7 @@ table Customer
 				    Navigate = Source{[Schema="raw",Item="customer"]}[Data],
 				    #"Renamed Columns" = Table.RenameColumns(Navigate,{{"Name", "Customer"}}),
 				    #"Removed Columns" = Table.RemoveColumns(#"Renamed Columns",{"Age"}),
-				    #"Changed Type" = Table.TransformColumnTypes(#"Removed Columns",{{"CustomerKey", Int64.Type}})
+				    #"Changed Type" = Table.TransformColumnTypes(#"Removed Columns",{{"CustomerKey", Int64.Type}, {"Birthday", type date}})
 				in
 				    #"Changed Type"
 

@@ -1,6 +1,6 @@
 {
-    "version": "4.0",
-    "settings": {
-        "qnaEnabled": true
-    }
+  "version": "4.0",
+  "settings": {
+    "qnaEnabled": true
+  }
 }

@@ -245,25 +245,29 @@ table Sales
 		dataType: int64
 		formatString: 0
 		lineageTag: 3e8d591f-687e-46dc-a584-5f5d8b98319c
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: OrderNumber
 
-		annotation SummarizationSetBy = Automatic
+		annotation SummarizationSetBy = User
 
 	column LineNumber
-		dataType: string
+		dataType: int64
+		formatString: 0
 		lineageTag: a59e4806-df34-4639-8dd5-905b85ca232d
 		summarizeBy: none
 		sourceColumn: LineNumber
 
-		annotation SummarizationSetBy = Automatic
+		annotation SummarizationSetBy = User
 
 	column OrderDate
 		dataType: dateTime
+		isHidden
 		formatString: Long Date
 		lineageTag: 674cead8-7836-4098-a5df-f5e136db7b64
 		summarizeBy: none
 		sourceColumn: OrderDate
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -354,7 +358,7 @@ table Sales
 				    #"Removed Columns" = Table.RemoveColumns(Source,{"UnitPrice"}),
 				    #"Changed Type1" = Table.TransformColumnTypes(#"Removed Columns",{{"DeliveryDate", type datetime}, {"OrderDate", type datetime}}),
 				    #"Changed Type2" = Table.TransformColumnTypes(#"Changed Type1",{{"DeliveryDate", type date}, {"OrderDate", type date}}),
-				    #"Changed Type" = Table.TransformColumnTypes(#"Changed Type2",{{"OrderNumber", Int64.Type}, {"StoreKey", Int64.Type}, {"CustomerKey", Int64.Type}, {"ProductKey", Int64.Type}, {"UnitCost", type number}, {"ExchangeRate", type number}, {"Time", type time}})    
+				    #"Changed Type" = Table.TransformColumnTypes(#"Changed Type2",{{"OrderNumber", Int64.Type}, {"StoreKey", Int64.Type}, {"CustomerKey", Int64.Type}, {"ProductKey", Int64.Type}, {"UnitCost", type number}, {"ExchangeRate", type number}, {"Time", type time}, {"LineNumber", Int64.Type}})    
 				in
 				    #"Changed Type"
 				```

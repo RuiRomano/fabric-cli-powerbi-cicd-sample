@@ -121,12 +121,52 @@ def create_workspace(workspace_name, capacity_name: str = "none", upns: list = N
 
     return workspace_id
 
+def create_connection(
+    connection_name: str = None,
+    parameters: dict = None,
+    upns: list = None
+):    
+
+    print(f"::group::Creating connection {connection_name}")
+
+    if parameters:
+        param_str = ",".join(f"{key}={value}" for key, value in parameters.items())
+        param_str = f"-P {param_str}"
+    else:
+        param_str = ""
+    
+   
+    run_fab_command(
+        f"create .connections/{connection_name}.Connection {param_str}",
+        silently_continue=True,
+    )
+
+    connection_id = run_fab_command(
+        f"get .connections/{connection_name}.Connection -q id", capture_output=True
+    )
+
+    if upns is not None:
+
+        upns = [x for x in upns if x.strip()]
+
+        if len(upns) > 0:
+            print(f"Adding UPNs to item {connection_name}")
+
+            for upn in upns:
+                run_fab_command(
+                    f"acl set -f .connections/{connection_name}.Connection -I {upn} -R admin"
+                )
+
+    print(f"::endgroup::")
+
+    return connection_id
 
 def create_item(
     workspace_name: str = None,
     item_type: str = None,
     item_name: str = None,
     parameters: dict = None,
+    upns: list = None
 ):    
 
     print(f"::group::Creating item {workspace_name}/{item_name}.{item_type}")
@@ -137,25 +177,16 @@ def create_item(
     else:
         param_str = ""
     
-    if (item_type == "connection"):
-        run_fab_command(
-            f"create .connections/{item_name}.Connection {param_str}",
-            silently_continue=True,
-        )
+   
+    run_fab_command(
+        f"create /{workspace_name}.workspace/{item_name}.{item_type} {param_str}",
+        silently_continue=True,
+    )
 
-        item_id = run_fab_command(
-            f"get .connections/{item_name}.Connection -q id", capture_output=True
-        )
-    else:
-        run_fab_command(
-            f"create /{workspace_name}.workspace/{item_name}.{item_type} {param_str}",
-            silently_continue=True,
-        )
-
-        item_id = run_fab_command(
-            f"get /{workspace_name}.workspace/{item_name}.{item_type} -q id",
-            capture_output=True,
-        )
+    item_id = run_fab_command(
+        f"get /{workspace_name}.workspace/{item_name}.{item_type} -q id",
+        capture_output=True,
+    )
 
     print(f"::endgroup::")
 
@@ -265,6 +296,6 @@ def copy_to_staging(path):
 
     # copy files to staging folder
 
-    shutil.copytree(path, path_staging, dirs_exist_ok=True)
+    shutil.copytree(path, path_staging, dirs_exist_ok=True, ignore=shutil.ignore_patterns("*.abf"))
 
     return path_staging

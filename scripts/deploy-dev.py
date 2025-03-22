@@ -5,11 +5,11 @@ import glob
 from utils import *
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument("--spn-auth", action="store_true", default=False)
-parser.add_argument("--workspace", default="RR-SalesSense-05")
-parser.add_argument("--admin-upns", default="")
+parser.add_argument("--spn-auth", action="store_true", default=True)
+parser.add_argument("--workspace", default="SalesSense")
+parser.add_argument("--admin-upns", default=os.getenv("FABRIC_ADMIN_UPNS"))
 parser.add_argument(
-    "--capacity", default="Trial-ruiromano-microsoft-com-05-24-2023-15-11-UTC"
+    "--capacity", default=os.getenv("FABRIC_CAPACITY")
 )
 
 args = parser.parse_args()
@@ -21,7 +21,7 @@ admin_upns = args.admin_upns
 
 if admin_upns:
     admin_upns = [upn.strip() for upn in admin_upns.split(",")]
-    
+
 lakehouse_name = "LH_STORE_RAW"
 connection_name = "SalesSense - DEV"
 connection_source_url = "https://raw.githubusercontent.com/pbi-tools/sales-sample/refs/heads/data/RAW-Sales.csv"
@@ -31,21 +31,20 @@ connection_source_url = "https://raw.githubusercontent.com/pbi-tools/sales-sampl
 if spn_auth:
     fab_authenticate_spn()
 
-# Create workspace
-
-workspace_id = create_workspace(workspace_name, capacity_name, upns=admin_upns)
-
 # Create Fabric connection to use in data pipeline
 
-connection_id = create_item(
-    item_type="connection",
-    item_name=connection_name,
+connection_id = create_connection(    
+    connection_name=connection_name,
     parameters={
         "connectionDetails.type": "HttpServer",
         "connectionDetails.parameters.url": connection_source_url,
         "credentialDetails.type": "Anonymous",
-    },
+    }    
 )
+
+# Create workspace
+
+workspace_id = create_workspace(workspace_name, capacity_name, upns=admin_upns)
 
 # Create lakehouse
 
@@ -61,28 +60,45 @@ lakehouse_id = create_item(
 deploy_item(
     "src/DP_INGST_CopyCSV.DataPipeline",
     workspace_name=workspace_name,
-    find_and_replace={             
-        (r"pipeline-content.json", r'("workspaceId"\s*:\s*)".*"'): rf'\1"{workspace_id}"',
-        (r"pipeline-content.json", r'("artifactId"\s*:\s*)".*"'): rf'\1"{lakehouse_id}"',
-        (r"pipeline-content.json", r'("connection"\s*:\s*)".*"'): rf'\1"{connection_id}"',
-    },
-    what_if=True
+    find_and_replace={
+        (
+            r"pipeline-content.json",
+            r'("workspaceId"\s*:\s*)".*"',
+        ): rf'\1"{workspace_id}"',
+        (
+            r"pipeline-content.json",
+            r'("artifactId"\s*:\s*)".*"',
+        ): rf'\1"{lakehouse_id}"',
+        (
+            r"pipeline-content.json",
+            r'("connection"\s*:\s*)".*"',
+        ): rf'\1"{connection_id}"',
+    },    
 )
 
 # Deploy notebook
 
 deploy_item(
     "src/NB_TRNSF_Raw.Notebook",
-    workspace_name=workspace_name,       
-    find_and_replace={        
-        (r"notebook-content.ipynb", r'("default_lakehouse"\s*:\s*)".*"'): rf'\1"{lakehouse_id}"'
-        ,
-        (r"notebook-content.ipynb", r'("default_lakehouse_name"\s*:\s*)".*"'): rf'\1"{lakehouse_name}"'
-        ,
-        (r"notebook-content.ipynb", r'("default_lakehouse_workspace_id"\s*:\s*)".*"'): rf'\1"{workspace_id}"'
-        ,
-        (r"notebook-content.ipynb", r'("known_lakehouses"\s*:\s*)\[[\s\S]*?\]'): rf'\1[{{"id": "{lakehouse_id}"}}]'
-    }    
+    workspace_name=workspace_name,
+    find_and_replace={
+        (
+            r"notebook-content.ipynb",
+            r'("default_lakehouse"\s*:\s*)".*"',
+        ): rf'\1"{lakehouse_id}"',
+        (
+            r"notebook-content.ipynb",
+            r'("default_lakehouse_name"\s*:\s*)".*"',
+        ): rf'\1"{lakehouse_name}"',
+        (
+            r"notebook-content.ipynb",
+            r'("default_lakehouse_workspace_id"\s*:\s*)".*"',
+        ): rf'\1"{workspace_id}"',
+        (
+            r"notebook-content.ipynb",
+            r'("known_lakehouses"\s*:\s*)\[[\s\S]*?\]',
+        ): rf'\1[{{"id": "{lakehouse_id}"}}]',
+    },
 )
 
 # Get SQL endpoint - its created asynchronously so we need to wait for it to be available
@@ -103,15 +119,18 @@ if not sql_endpoint:
 
 semanticmodel_id = deploy_item(
     "src/SM_SalesSense.SemanticModel",
-    workspace_name=workspace_name,    
-    find_and_replace={        
-        (r"expressions.tmdl", r'(expression\s+Server\s*=\s*)".*?"'): rf'\1"{sql_endpoint}"'        
-    }
+    workspace_name=workspace_name,
+    find_and_replace={
+        (
+            r"expressions.tmdl",
+            r'(expression\s+Server\s*=\s*)".*?"',
+        ): rf'\1"{sql_endpoint}"'
+    },
 )
 
 # Deploy reports
 
-for report_path in glob.glob('src/*.Report'):
+for report_path in glob.glob("src/*.Report"):
 
     deploy_item(
         report_path,
@@ -132,7 +151,7 @@ for report_path in glob.glob('src/*.Report'):
                     },
                 }
             )
-        },    
+        },
     )
 
 # Log out in case of auth with SPN
