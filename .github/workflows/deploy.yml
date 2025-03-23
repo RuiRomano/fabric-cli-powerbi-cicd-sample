@@ -10,7 +10,7 @@ on:
     paths:
       - '**/src/**'           
     
-  # Deploys to PRD every day
+  # Deploys to PRD every day (commented to save Actions minutes in Github)
 
   # schedule:
   #   - cron: "0 0 * * *"   # Every day at 00:00  
