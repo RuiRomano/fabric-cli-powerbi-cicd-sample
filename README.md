@@ -1,22 +1,27 @@
+[![bpa](https://github.com/RuiRomano/demos-cicd-salessense/actions/workflows/bpa.yml/badge.svg)](https://github.com/RuiRomano/demos-cicd-salessense/actions/workflows/bpa.yml) [![deploy](https://github.com/RuiRomano/demos-cicd-salessense/actions/workflows/deploy.yml/badge.svg)](https://github.com/RuiRomano/demos-cicd-salessense/actions/workflows/deploy.yml)
 
-This repository demonstrates a CICD scenario using [Fabric CLI](https://github.com/microsoft/fabric-cli) and GitHub workflows focused for Power BI semantic models and reports.
+This repository demonstrates a Fabric CICD scenario using [Fabric CLI](https://github.com/microsoft/fabric-cli) and GitHub. It can be easily adapted to any scenario.
 
-# Instructions
+- All source source code is in [\src](.\src) folder.
+- Developers should develop in isolation in a feature branch.
+- Pull-requests to main branch, trigger a best practices analysis pipeline [bpa.yml](./.github/workflows/bpa.yml) for both semantic models and reports. Using community tools [Tabular Editor](https://github.com/TabularEditor/) and [PBI-Inspector](https://github.com/NatVanG/PBI-InspectorV2)
+- After successful merge to main branch, triggers the deployment pipeline [deploy.yml](./.github/workflows/deploy.yml) that ensures an automated deployment to the `development` environment.
+- Everyday the deployment pipeline [deploy.yml](./.github/workflows/deploy.yml) runs by a schedule trigger to deploy to the `production` environment.
 
-## Run with GitHub actions
+## Instructions
 
-- Fork this repo.
-- Configure required [Github secrets and variables](#secrets-and-variables)
-- Run the [deploy](/.github/workflows/deploy.yml) Github workflow.
+- Fork the repo.
+- Configure required [Github secrets and variables](#secrets-and-variables) in your repo.
+- Run the [deploy](/.github/workflows/deploy.yml) Github workflow to deploy into your tenant.
 
-## Run scripts locally
+### Run scripts locally
 
 Make sure you have the [Fabric CLI](https://github.com/microsoft/fabric-cli) installed. If not, run:
 ```bash
 $ pip install dist/fabric_cli-0.1.8-py3-none-any.whl --force-reinstall
 ```
 
-## Secrets and variables
+### Secrets and variables
 
 Before running the Github Action, ensure you configure the following [GitHub action secrets and variables](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions):
 
