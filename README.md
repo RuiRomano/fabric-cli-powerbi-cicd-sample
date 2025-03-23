@@ -6,7 +6,7 @@ Here’s your revised version with improved grammar and clarity:
 
 This repository demonstrates a Fabric CI/CD scenario using [Fabric CLI](https://github.com/microsoft/fabric-cli) and GitHub. It can be easily adapted to other use cases.  
 
-- All source code is located in the [\src](.\src) folder.  
+- All source code is located in the [\src](/src/) folder.  
 - Developers should work in isolation within a feature branch.  
 - Pull requests to the main branch trigger a best practices analysis pipeline, [bpa.yml](./.github/workflows/bpa.yml), for both semantic models and reports. This process leverages community tools such as [Tabular Editor](https://github.com/TabularEditor/) and [PBI-Inspector](https://github.com/NatVanG/PBI-InspectorV2).  
 - Upon a successful merge into the main branch, the deployment pipeline, [deploy.yml](./.github/workflows/deploy.yml), is triggered to ensure automated deployment to the `development` environment.  
