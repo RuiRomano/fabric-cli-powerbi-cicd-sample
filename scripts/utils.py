@@ -4,10 +4,6 @@ import subprocess
 import re
 import json
 
-current_folder = os.path.dirname(__file__)
-debug = False
-
-
 def fab_authenticate_spn(
     client_id: str = None, client_secret: str = None, tenant_id: str = None
 ):
@@ -60,9 +56,6 @@ def run_fab_command(
     Raises:
     Exception: If there is an error running the Fabric command.
     """
-
-    if debug and not include_secrets:
-        print(f"Running fab command: {command}")
 
     result = subprocess.run(
         ["fab", "-c", command], capture_output=capture_output, text=True
@@ -121,11 +114,19 @@ def create_workspace(workspace_name, capacity_name: str = "none", upns: list = N
 
     return workspace_id
 
+
 def create_connection(
-    connection_name: str = None,
-    parameters: dict = None,
-    upns: list = None
-):    
+    connection_name: str = None, parameters: dict = None, upns: list = None
+):
+    """
+    Creates a connection with the specified name, parameters, and UPNs.
+    Args:
+        connection_name (str, optional): The name of the connection to create. Defaults to None.
+        parameters (dict, optional): A dictionary of parameters to include in the connection. Defaults to None.
+        upns (list, optional): A list of UPNs to add to the connection with admin rights. Defaults to None.
+    Returns:
+        str: The ID of the created connection.
+    """
 
     print(f"::group::Creating connection {connection_name}")
 
@@ -134,8 +135,7 @@ def create_connection(
         param_str = f"-P {param_str}"
     else:
         param_str = ""
-    
-   
+
     run_fab_command(
         f"create .connections/{connection_name}.Connection {param_str}",
         silently_continue=True,
@@ -161,13 +161,25 @@ def create_connection(
 
     return connection_id
 
+
 def create_item(
     workspace_name: str = None,
     item_type: str = None,
     item_name: str = None,
     parameters: dict = None,
-    upns: list = None
-):    
+    upns: list = None,
+):
+    """
+    Creates an item in the specified workspace.
+    Args:
+        workspace_name (str, optional): The name of the workspace where the item will be created.
+        item_type (str, optional): The type of the item to be created.
+        item_name (str, optional): The name of the item to be created.
+        parameters (dict, optional): A dictionary of parameters to be passed during item creation.
+        upns (list, optional): A list of UPNs (User Principal Names) associated with the item.
+    Returns:
+        str: The ID of the created item.
+    """
 
     print(f"::group::Creating item {workspace_name}/{item_name}.{item_type}")
 
@@ -176,8 +188,7 @@ def create_item(
         param_str = f"-P {param_str}"
     else:
         param_str = ""
-    
-   
+
     run_fab_command(
         f"create /{workspace_name}.workspace/{item_name}.{item_type} {param_str}",
         silently_continue=True,
@@ -202,6 +213,23 @@ def deploy_item(
     what_if: bool = False,
     func_after_staging=None,
 ):
+    """
+    Deploys an item to a specified workspace.
+    Args:
+        src_path (str): The source path of the item to be deployed.
+        workspace_name (str): The name of the workspace where the item will be deployed.
+        item_type (str, optional): The type of the item. If not provided, it will be inferred from the platform data.
+        item_name (str, optional): The name of the item. If not provided, it will be inferred from the platform data.
+        find_and_replace (dict, optional): A dictionary where keys are tuples containing a file filter regex and a find regex,
+                                           and values are the replacement strings. This will be used to perform find and replace
+                                           operations on the files in the staging path.
+        what_if (bool, optional): If True, the deployment will be simulated but not actually performed. Defaults to False.
+        func_after_staging (callable, optional): A function to be called after the item is copied to the staging path. It should
+                                                 accept the staging path as its only argument.
+    Returns:
+        str: The ID of the deployed item if `what_if` is False. Otherwise, returns None.
+    """
+
     print(f"::group::Deploying {src_path}")
 
     staging_path = copy_to_staging(src_path)
@@ -214,7 +242,7 @@ def deploy_item(
     if os.path.exists(os.path.join(staging_path, ".platform")):
 
         with open(os.path.join(staging_path, ".platform"), "r") as file:
-            platform_data = json.load(file)        
+            platform_data = json.load(file)
 
         if item_name is None:
             item_name = platform_data["metadata"]["displayName"]
@@ -287,6 +315,8 @@ def copy_to_staging(path):
 
     # ensure staging folder exists
 
+    current_folder = os.path.dirname(__file__)
+    
     path_staging = os.path.join(current_folder, "_stg", os.path.basename(path))
 
     if os.path.exists(path_staging):
@@ -296,6 +326,8 @@ def copy_to_staging(path):
 
     # copy files to staging folder
 
-    shutil.copytree(path, path_staging, dirs_exist_ok=True, ignore=shutil.ignore_patterns("*.abf"))
+    shutil.copytree(
+        path, path_staging, dirs_exist_ok=True, ignore=shutil.ignore_patterns("*.abf")
+    )
 
     return path_staging
