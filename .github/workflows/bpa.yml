@@ -22,3 +22,6 @@ jobs:
 
         - name: Semantic Models
           run: .\scripts\bpa-semanticmodel.ps1 -path "." -src "./src/*.SemanticModel"
+      
+        - name: Reports
+          run: .\scripts\bpa-report.ps1 -path "." -src "./src/*.Report"

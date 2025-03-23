@@ -18,7 +18,7 @@ $ pip install dist/fabric_cli-0.1.8-py3-none-any.whl --force-reinstall
 
 ## Secrets and variables
 
-Before running the Github Action, ensure you configure the following [GitHub action secrets and variables](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions)
+Before running the Github Action, ensure you configure the following [GitHub action secrets and variables](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions):
 
 | Name            | Type   | Value                |
 |-----------------|--------|----------------------|
