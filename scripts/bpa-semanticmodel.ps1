@@ -1,7 +1,9 @@
 param ($path = $null, $src = ".\..\src\*.SemanticModel")
 
+$currentFolder = (Split-Path $MyInvocation.MyCommand.Definition -Parent)
+
 if ($path -eq $null) {
-    $path =  (Split-Path $MyInvocation.MyCommand.Definition -Parent)
+    $path =  $currentFolder
 }
 
 Set-Location $path
@@ -10,7 +12,7 @@ if ($src) {
 
     # Download Tabular Editor
 
-    $destinationPath = ".\_tools\TE"
+    $destinationPath = "$currentFolder\_tools\TE"
 
     if (!(Test-Path "$destinationPath\TabularEditor.exe"))
     {
@@ -29,7 +31,7 @@ if ($src) {
         Remove-Item $zipFile          
     }    
     
-    $rulesPath = "$path\bpa-semanticmodel-rules.json"
+    $rulesPath = "$currentFolder\bpa-semanticmodel-rules.json"
 
     if (!(Test-Path $rulesPath))
     {
