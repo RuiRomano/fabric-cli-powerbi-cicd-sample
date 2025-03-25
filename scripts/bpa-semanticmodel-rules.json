@@ -615,7 +615,7 @@
     "Name": "[Formatting] Do not summarize numeric columns",
     "Category": "Formatting",
     "Description": "Numeric columns (integer, decimal, double) should have their SummarizeBy property set to \"None\" to avoid accidental summation in Power BI (create measures instead).",
-    "Severity": 3,
+    "Severity": 2,
     "Scope": "DataColumn, CalculatedColumn, CalculatedTableColumn",
     "Expression": "(\r\nDataType = \"Int64\"\r\nor \r\nDataType=\"Decimal\" \r\nor \r\nDataType=\"Double\"\r\n)\n\r\nand \r\nSummarizeBy <> \"None\"\r\n\nand not (IsHidden or Table.IsHidden)",
     "FixExpression": "SummarizeBy = AggregateFunction.None",
