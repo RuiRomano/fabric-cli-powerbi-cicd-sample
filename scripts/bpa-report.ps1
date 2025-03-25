@@ -1,7 +1,9 @@
 param ($path = $null, $src = ".\..\src\*.Report")
 
+$currentFolder = (Split-Path $MyInvocation.MyCommand.Definition -Parent)
+
 if ($path -eq $null) {
-    $path =  (Split-Path $MyInvocation.MyCommand.Definition -Parent)
+    $path =  $currentFolder
 }
 
 Set-Location $path
@@ -10,7 +12,7 @@ if ($src) {
 
     # Download Tabular Editor
 
-    $destinationPath = ".\_tools\PBIInspector"
+    $destinationPath = "$currentFolder\_tools\PBIInspector"
 
     if (!(Test-Path "$destinationPath\win-x64\CLI\PBIRInspectorCLI.exe"))
     {
@@ -29,7 +31,7 @@ if ($src) {
         Remove-Item $zipFile          
     }    
     
-    $rulesPath = "$path\bpa-report-rules.json"
+    $rulesPath = "$currentFolder\bpa-report-rules.json"
 
     if (!(Test-Path $rulesPath))
     {
