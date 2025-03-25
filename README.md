@@ -1,8 +1,5 @@
 [![bpa](https://github.com/RuiRomano/demos-cicd-salessense/actions/workflows/bpa.yml/badge.svg)](https://github.com/RuiRomano/demos-cicd-salessense/actions/workflows/bpa.yml) [![deploy](https://github.com/RuiRomano/demos-cicd-salessense/actions/workflows/deploy.yml/badge.svg)](https://github.com/RuiRomano/demos-cicd-salessense/actions/workflows/deploy.yml)
 
-Here’s your revised version with improved grammar and clarity:  
-
----  
 
 This repository demonstrates a Fabric CI/CD scenario using [Fabric CLI](https://github.com/microsoft/fabric-cli) and GitHub. It can be easily adapted to other use cases.  
 
