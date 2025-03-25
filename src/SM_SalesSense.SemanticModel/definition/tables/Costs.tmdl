@@ -1,0 +1,129 @@
+table Costs
+	lineageTag: 3e9b8cf8-6bca-416a-a09e-de9c4a801078
+
+	column 'Cost Number'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 374488aa-e619-4811-a361-071276272d22
+		summarizeBy: none
+		sourceColumn: Cost Number
+
+	column 'Line Number'
+		dataType: int64
+		formatString: 0
+		lineageTag: 1a91171e-ae89-4b54-9d5f-4ba3c264c24e
+		summarizeBy: none
+		sourceColumn: Line Number
+
+	column 'Purchase Date'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: b3f1f2d7-d98b-441a-b23e-28d248f47fba
+		summarizeBy: none
+		sourceColumn: Purchase Date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Shipping Date'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 2721c525-73c0-4359-85e5-cb265de35a16
+		summarizeBy: none
+		sourceColumn: Shipping Date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Warehouse Key'
+		dataType: int64
+		formatString: 0
+		lineageTag: 204d10f4-3c5c-478c-885a-d22e30717f50
+		summarizeBy: count
+		sourceColumn: Warehouse Key
+
+	column StoreKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 936e71dd-e658-4e37-a5ee-fb406afd1448
+		summarizeBy: count
+		sourceColumn: StoreKey
+
+	column ProductKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 7140f960-b285-45ed-aa56-b7a21d86c535
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+	column 'Shipping Cost'
+		dataType: decimal
+		formatString: "€"#,0.###############;("€"#,0.###############);"€"#,0.###############
+		lineageTag: 67d12228-176f-42a2-aa57-776ad2342d28
+		summarizeBy: sum
+		sourceColumn: Shipping Cost
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'Currency Code'
+		dataType: string
+		lineageTag: 3a9d1f01-1391-4410-be3c-df40950d7210
+		summarizeBy: none
+		sourceColumn: Currency Code
+
+	column 'Exchange Rate'
+		dataType: decimal
+		formatString: "€"#,0.###############;("€"#,0.###############);"€"#,0.###############
+		lineageTag: 49998292-d058-469b-88ec-f8fd7cf2dd0f
+		summarizeBy: average
+		sourceColumn: Exchange Rate
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column Time
+		dataType: dateTime
+		formatString: Long Time
+		lineageTag: b94482cd-eb64-45cf-a85c-b8d0341b2753
+		summarizeBy: none
+		sourceColumn: Time
+
+		annotation UnderlyingDateTimeDataType = Time
+
+	column Quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: 796cb56b-4cf1-48be-8397-48101d5f1928
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+	column 'Unit Cost'
+		dataType: decimal
+		formatString: "€"#,0.###############;("€"#,0.###############);"€"#,0.###############
+		lineageTag: 1ac4fd25-e65f-42b4-8b91-01fa8f0d4160
+		summarizeBy: average
+		sourceColumn: Unit Cost
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column Environment
+		dataType: string
+		lineageTag: ecfec7f4-9898-422f-bf8b-316689ff675b
+		summarizeBy: none
+		sourceColumn: Environment
+
+	partition costs_partition = m
+		mode: import
+		source = ```
+				let
+				    Source = SalesDateAdjustedAndSalesRandomized,  
+				    #"Removed Columns" = Table.RemoveColumns(Source,{"UnitPrice"}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Removed Columns",{{"DeliveryDate", type datetime}, {"OrderDate", type datetime}}),
+				    #"Changed Type2" = Table.TransformColumnTypes(#"Changed Type1",{{"DeliveryDate", type date}, {"OrderDate", type date}}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Changed Type2",{{"OrderNumber", Int64.Type}, {"StoreKey", Int64.Type}, {"CustomerKey", Int64.Type}, {"ProductKey", Int64.Type}, {"UnitCost", type number}, {"ExchangeRate", type number}, {"Time", type time}, {"LineNumber", Int64.Type}})    
+				in
+				    #"Changed Type"
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
