@@ -19,7 +19,7 @@ This repository demonstrates a Fabric CI/CD scenario using [Fabric CLI](https://
 
 Make sure you have the [Fabric CLI](https://github.com/microsoft/fabric-cli) installed. If not, run:
 ```bash
-$ pip install dist/fabric_cli-0.1.8-py3-none-any.whl --force-reinstall
+$ pip install ms-fabric-cli
 ```
 
 ### Secrets and variables

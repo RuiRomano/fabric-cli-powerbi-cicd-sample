@@ -154,6 +154,8 @@ for report_path in glob.glob("src/*.Report"):
         },
     )
 
+run_fab_command(f"open {workspace_name}.workspace")
+
 # Log out in case of auth with SPN
 
 if spn_auth:

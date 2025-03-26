@@ -60,7 +60,7 @@ jobs:
 
       - name: Install Fabric CLI
         run: |
-          python -m pip install cli/fabric_cli-0.1.8-py3-none-any.whl
+          python -m pip install ms-fabric-cli
 
       - name: Run Deployment Script {Dev}        
         env:

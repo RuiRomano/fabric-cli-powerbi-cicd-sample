@@ -20,7 +20,7 @@ if ($src) {
 
         Write-Host "Downloading binaries"
     
-        $downloadUrl = "https://github.com/NatVanG/PBI-InspectorV2/releases/latest/download/win-x64-CLI.zip"
+        $downloadUrl = "https://github.com/NatVanG/PBI-InspectorV2/releases/download/v2.2.0/win-x64-CLI.zip"
     
         $zipFile = "$destinationPath\PBIInspector.zip"
     
@@ -57,7 +57,7 @@ if ($src) {
 
         Write-Host "Running BPA rules for: '$itemPath'"
 
-        $process = Start-Process -FilePath "$destinationPath\win-x64\CLI\PBIRInspectorCLI.exe" -ArgumentList "-pbipreport ""$itemPath"" -rules ""$rulesPath"" -formats ""ADO""" -NoNewWindow -Wait -PassThru    
+        $process = Start-Process -FilePath "$destinationPath\win-x64\CLI\PBIRInspectorCLI.exe" -ArgumentList "-pbipreport ""$itemPath"" -rules ""$rulesPath"" -formats ""GitHub""" -NoNewWindow -Wait -PassThru    
 
         if ($process.ExitCode -ne 0) {
             throw "Error running BPA rules for: '$itemPath'"
