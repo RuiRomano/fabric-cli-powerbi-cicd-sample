@@ -124,6 +124,19 @@
             "width": 234
           },
           "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1959.3338714259044,
+            "y": 353.72074960100292
+          },
+          "nodeIndex": "Costs",
+          "nodeLineageTag": "b3b2de25-8f1e-4eb5-9d02-01aa8db7f72b",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
         }
       ],
       "name": "All tables",

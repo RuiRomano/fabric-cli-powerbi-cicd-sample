@@ -1,0 +1,171 @@
+table Costs
+	lineageTag: b3b2de25-8f1e-4eb5-9d02-01aa8db7f72b
+
+	column CostNumber
+		dataType: int64
+		formatString: 0
+		lineageTag: ae51a2a7-134c-4c34-bfb9-cdb791fc76ae
+		summarizeBy: none
+		sourceColumn: CostNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column LineNumber
+		dataType: int64
+		formatString: 0
+		lineageTag: a059f55f-36ec-43fd-af45-e76706aa3268
+		summarizeBy: none
+		sourceColumn: LineNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column PurchaseDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: a553ffa1-f265-4387-af5d-f0b507538a3e
+		summarizeBy: none
+		sourceColumn: PurchaseDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ShippingDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: e44194fd-1796-4f45-abc2-cb35d1011e0f
+		summarizeBy: none
+		sourceColumn: ShippingDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column WarehouseKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 642127c8-5169-4dba-bdc0-800c16bd7879
+		summarizeBy: count
+		sourceColumn: WarehouseKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column StoreKey
+		dataType: int64
+		formatString: 0
+		lineageTag: ebb1769c-5305-4d1c-8a12-18be1d6e2ff5
+		summarizeBy: none
+		sourceColumn: StoreKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductKey
+		dataType: int64
+		formatString: 0
+		lineageTag: a924e3ba-0367-4308-81c6-f2bef02cb621
+		summarizeBy: count
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ShippingCost
+		dataType: double
+		lineageTag: c4ac8d19-bcd9-4aa8-9cba-a8d0f3918d7a
+		summarizeBy: sum
+		sourceColumn: ShippingCost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column CurrencyCode
+		dataType: string
+		lineageTag: b51b9b9b-45f9-4993-a00b-3f71b8d976e8
+		summarizeBy: none
+		sourceColumn: CurrencyCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column ExchangeRate
+		dataType: double
+		lineageTag: 7e5493df-f8f6-487c-a121-af78b5c5144d
+		summarizeBy: none
+		sourceColumn: ExchangeRate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Time
+		dataType: dateTime
+		formatString: Long Time
+		lineageTag: 9b23df78-99c4-45df-aa75-1fbfbce3df15
+		summarizeBy: none
+		sourceColumn: Time
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Time
+
+	column Quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: e576aa52-ca8c-4c8a-a387-050eb35d8fcd
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column UnitCost
+		dataType: decimal
+		formatString: "€"#,0.###############;("€"#,0.###############);"€"#,0.###############
+		lineageTag: 42e5663c-ae63-4660-87d1-a64759c16832
+		summarizeBy: sum
+		sourceColumn: UnitCost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column Tax
+		dataType: decimal
+		formatString: "€"#,0.###############;("€"#,0.###############);"€"#,0.###############
+		lineageTag: a9f07838-4605-40b0-86a8-502154613ea4
+		summarizeBy: sum
+		sourceColumn: Tax
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column Discount
+		dataType: decimal
+		formatString: "€"#,0.###############;("€"#,0.###############);"€"#,0.###############
+		lineageTag: 2ead53e5-a2e6-4932-ba07-bda2cedd9deb
+		summarizeBy: sum
+		sourceColumn: Discount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	partition Costs = m
+		mode: import
+		source =
+				let
+					Source = SalesDateAdjustedAndSalesRandomized,
+					#"Removed Columns" = Table.RemoveColumns(Source,{"UnitPrice"}),
+					#"Changed Type1" = Table.TransformColumnTypes(#"Removed Columns",{{"DeliveryDate", type datetime}, {"OrderDate", type datetime}}),
+					#"Changed Type2" = Table.TransformColumnTypes(#"Changed Type1",{{"DeliveryDate", type date}, {"OrderDate", type date}}),
+					#"Changed Type" = Table.TransformColumnTypes(#"Changed Type2",{{"OrderNumber", Int64.Type}, {"StoreKey", Int64.Type}, {"CustomerKey", Int64.Type}, {"ProductKey", Int64.Type}, {"UnitCost", type number}, {"ExchangeRate", type number}, {"Time", type time}, {"LineNumber", Int64.Type}})    ,
+					#"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"OrderNumber", "CostNumber"}, {"OrderDate", "PurchaseDate"}, {"DeliveryDate", "ShippingDate"}, {"CustomerKey", "WarehouseKey"}, {"UnitCost", "ShippingCost"}, {"NetPrice", "UnitCost"}}),
+				    #"Added Custom" = Table.AddColumn(#"Renamed Columns", "Tax", each Number.RandomBetween(0.1, 0.2) * [UnitCost]),
+				    #"Added Custom1" = Table.AddColumn(#"Added Custom", "Discount", each [UnitCost] * (1 - Number.RandomBetween(0.8, 1))),
+				    #"Changed Type3" = Table.TransformColumnTypes(#"Added Custom1",{{"Discount", Currency.Type}, {"Tax", Currency.Type}})
+				in
+				    #"Changed Type3"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

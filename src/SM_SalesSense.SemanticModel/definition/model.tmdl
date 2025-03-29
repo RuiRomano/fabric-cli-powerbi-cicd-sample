@@ -11,7 +11,7 @@ annotation PBIDesktopVersion = 2.141.1177.0 (25.03)+c500dc5720dc9271c2dcfef12309
 
 annotation __PBI_TimeIntelligenceEnabled = 0
 
-annotation PBI_QueryOrder = ["Server","Database","Randomizer","Calendar","Sales","SalesDateAdjustedAndSalesRandomized","Product","Customer","Store","About"]
+annotation PBI_QueryOrder = ["Server","Database","Randomizer","Calendar","Sales","SalesDateAdjustedAndSalesRandomized","Product","Customer","Store","About","Costs"]
 
 annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["PARTITION_NAME_SHOULD_MATCH_TABLE_NAME_FOR_SINGLE_PARTITION_TABLES"]}
 
@@ -28,6 +28,7 @@ ref table Store
 ref table About
 ref table 'Field Parameter'
 ref table 'Time Intelligence'
+ref table Costs
 
 ref role 'Store - Canada'
 ref role 'Store - United States'
