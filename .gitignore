@@ -8,3 +8,5 @@ local-*.py
 /scripts/_stg
 
 /scripts/__pycache__
+
+_local/**
