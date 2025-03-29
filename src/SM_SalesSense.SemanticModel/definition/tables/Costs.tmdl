@@ -1,6 +1,26 @@
 table Costs
 	lineageTag: b3b2de25-8f1e-4eb5-9d02-01aa8db7f72b
 
+	/// Total cost incurred for shipping products
+	measure 'Total Shipping Cost' = sum(Costs[ShippingCost])
+		formatString: "€"#,0.###############;("€"#,0.###############);"€"#,0.###############
+
+	/// Total quantity of items sold
+	measure 'Total Quantity' = sum(Costs[Quantity])
+		formatString: 0
+
+	/// Total cost of products sold
+	measure 'Total Unit Cost' = sum(Costs[UnitCost])
+		formatString: "€"#,0.###############;("€"#,0.###############);"€"#,0.###############
+
+	/// Total tax applied to sales
+	measure 'Total Tax' = sum(Costs[Tax])
+		formatString: "€"#,0.###############;("€"#,0.###############);"€"#,0.###############
+
+	/// Total discount provided on sales
+	measure 'Total Discount' = sum(Costs[Discount])
+		formatString: "€"#,0.###############;("€"#,0.###############);"€"#,0.###############
+
 	column CostNumber
 		dataType: int64
 		formatString: 0
