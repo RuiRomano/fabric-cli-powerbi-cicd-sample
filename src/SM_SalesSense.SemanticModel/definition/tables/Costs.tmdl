@@ -13,11 +13,11 @@ table Costs
 	measure 'Total Unit Cost' = sum(Costs[UnitCost])
 		formatString: "€"#,0.###############;("€"#,0.###############);"€"#,0.###############
 
-	/// Total tax applied to sales
+	/// Total tax applied to purchase
 	measure 'Total Tax' = sum(Costs[Tax])
 		formatString: "€"#,0.###############;("€"#,0.###############);"€"#,0.###############
 
-	/// Total discount provided on sales
+	/// Total discount provided on purchase
 	measure 'Total Discount' = sum(Costs[Discount])
 		formatString: "€"#,0.###############;("€"#,0.###############);"€"#,0.###############
 
