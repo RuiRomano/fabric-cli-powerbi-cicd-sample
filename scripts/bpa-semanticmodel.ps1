@@ -46,7 +46,7 @@ if ($src) {
 
     $itemsFolders = Get-ChildItem  -Path $src -recurse -include ("*.pbidataset", "*.pbism")
 
-    foreach ($itemFolder in $itemsFolders) {	
+    foreach ($itemFolder in $itemsFolders) {
         $itemPath = "$($itemFolder.Directory.FullName)\definition"
 
         if (!(Test-Path $itemPath)) {
